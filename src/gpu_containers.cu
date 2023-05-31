@@ -48,9 +48,10 @@ __host__ __device__ GPUPolygon::GPUPolygon(int size, GPUPoint points[])
 // Copy constructor
 __host__ __device__ GPUPolygon::GPUPolygon(GPUPolygon &that)
 {
-    // Using assert to work both on host and device.
-    // Stop execution if the polygons don't have the same size.
-    assert(this->size == that.size);
+    // printf("In copy constructor\n");
+
+    this->size = that.size;
+    this->points = new GPUPoint[this->size];
 
     for (int i = 0; i < size; i++)
     {
@@ -61,11 +62,15 @@ __host__ __device__ GPUPolygon::GPUPolygon(GPUPolygon &that)
 // Copy assignment operator
 __host__ __device__ GPUPolygon &GPUPolygon::operator=(const GPUPolygon &that)
 {
+    // printf("In copy assignment operator\n");
     if (this != &that)
     {
         // Using assert to work both on host and device.
         // Stop execution if the polygons don't have the same size.
         assert(this->size == that.size);
+
+        this->size = that.size;
+        this->points = new GPUPoint[this->size];
 
         for (int i = 0; i < size; i++)
         {
