@@ -16,14 +16,23 @@ public:
 class GPUPolygon
 {
 public:
+    // NOTE: 1st point is the same as the last one.
     GPUPoint *points;
     int size;
+    // Hilbert space polygon rasterization matrix
+    int *matrix;
+    // Hilbert space polygon min/max (MBR)
+    GPUPoint hMin;
+    GPUPoint hMax;
+    int mbrWidth;
+    int mbrHeight;
 
     __host__ __device__ GPUPolygon(int size, GPUPoint points[]);
     __host__ __device__ GPUPolygon(GPUPolygon &that);
-    __host__ __device__ GPUPolygon& operator=(const GPUPolygon& that);
+    __host__ __device__ GPUPolygon& operator=(const GPUPolygon &that);
     __host__ __device__ ~GPUPolygon();
     __host__ __device__ void print();
+    __host__ __device__ void printMatrix();
 };
 
 #endif

@@ -89,9 +89,29 @@ __host__ __device__ GPUPolygon::~GPUPolygon()
 // Prints the polygon points.
 __host__ __device__ void GPUPolygon::print()
 {
-    printf("Polygon:\n");
+    printf("----- Polygon -----\n");
+    printf("Hilbert min: ");
+    hMin.print();
+    printf("Hilbert max: ");
+    hMax.print();
+    printf("Points:\n");
     for (int i = 0; i < size; i++)
     {
         points[i].print();
+    }
+}
+
+// Prints polygon's rasterization matrix.
+__host__ __device__ void GPUPolygon::printMatrix()
+{
+    printf("Rasterization matrix:\n");
+    printf("Size (WxH): %dx%d\n", mbrWidth, mbrHeight);
+    for (int i = 0; i < mbrWidth; i++)
+    {
+        for (int j = 0; j < mbrHeight; j++)
+        {
+            printf("%d ", matrix[i * mbrWidth + j]);
+        }
+        printf("\n");
     }
 }
