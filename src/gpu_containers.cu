@@ -21,6 +21,13 @@ __host__ __device__ GPUPoint::GPUPoint(float x, float y)
     this->y = y;
 }
 
+// Copy constructor
+__host__ __device__ GPUPoint::GPUPoint(GPUPoint &that)
+{
+    this->x = that.x;
+    this->y = that.y;
+}
+
 // Destructor
 __host__ __device__ GPUPoint::~GPUPoint()
 {
@@ -106,11 +113,25 @@ __host__ __device__ void GPUPolygon::printMatrix()
 {
     printf("Rasterization matrix:\n");
     printf("Size (WxH): %dx%d\n", mbrWidth, mbrHeight);
+    printf("   ");
     for (int i = 0; i < mbrWidth; i++)
     {
-        for (int j = 0; j < mbrHeight; j++)
+        printf("%d ", i%10);
+    }
+    printf("\n");
+    for (int i = 0; i < mbrHeight; i++)
+    {
+        printf("%2d ", i);
+        for (int j = 0; j < mbrWidth; j++)
         {
-            printf("%d ", matrix[i * mbrWidth + j]);
+            if (matrix[(i * mbrWidth) + j] == 3)
+            {
+                printf(". ");
+            }
+            else
+            {
+                printf("%d ", matrix[(i * mbrWidth) + j]);
+            }
         }
         printf("\n");
     }

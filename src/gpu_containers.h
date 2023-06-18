@@ -9,6 +9,7 @@ public:
 
     __host__ __device__ GPUPoint(float x, float y);
     __host__ __device__ GPUPoint();
+    __host__ __device__ GPUPoint(GPUPoint &that);
     __host__ __device__ ~GPUPoint();
     __host__ __device__ void print();
 };
