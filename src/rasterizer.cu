@@ -55,6 +55,7 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     int t_ID = blockIdx.x * blockDim.x + threadIdx.x;
 
     // Number of threads MUST be equal to the edges of the polygon.
+    // TODO improve a bit
     assert(t_ID < poly.size);
 
     // Find edge stard/end with positive orientation (on x axis).
@@ -68,31 +69,31 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
         startPoint = GPUPoint(poly.points[t_ID + 1]);
         endPoint = GPUPoint(poly.points[t_ID]);
     }
-    printf("Edge %d\n", t_ID + 1);
-    printf("Starting point: ");
-    startPoint.print();
-    printf("Ending point: ");
-    endPoint.print();
+    // printf("Edge %d\n", t_ID + 1);
+    // printf("Starting point: ");
+    // startPoint.print();
+    // printf("Ending point: ");
+    // endPoint.print();
 
     startCell.x = (int)startPoint.x;
     startCell.y = (int)startPoint.y;
     endCell.x = (int)endPoint.x;
     endCell.y = (int)endPoint.y;
-    printf("Starting cell: ");
-    startCell.print();
-    printf("Ending cell: ");
-    endCell.print();
+    // printf("Starting cell: ");
+    // startCell.print();
+    // printf("Ending cell: ");
+    // endCell.print();
 
     // Edge always goes from smaller X to larger.
     step.x = 1;
     step.y = endPoint.y > startPoint.y ? 1 : -1;
-    printf("Steps: ");
-    step.print();
+    // printf("Steps: ");
+    // step.print();
 
     // Find nearest vertical & horizontal grid lines based on edge direction.
     nextVertical = ceilf(startPoint.x);
     nextHorizontal = step.y == 1 ? ceilf(startPoint.y) : floorf(startPoint.y);
-    printf("Next horizontal: %d, next vertical: %d\n", nextHorizontal, nextVertical);
+    // printf("Next horizontal: %d, next vertical: %d\n", nextHorizontal, nextVertical);
 
     gradient = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
     edgeLength = sqrtf(powf(endPoint.x - startPoint.x, 2) + powf(endPoint.y - startPoint.y, 2));
@@ -105,16 +106,16 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     float intersectX = ((nextHorizontal - startPoint.y) / gradient) + startPoint.x;
     tMax.y = sqrtf(powf(intersectX - startPoint.x, 2) + powf(nextHorizontal - startPoint.y, 2));
 
-    printf("Gradient: %f\n", gradient);
-    printf("Intersection with vertical at: (%d, %f)\n", nextVertical, intersectY);
-    printf("Intersection with horizontal at: (%f, %d)\n", intersectX, nextHorizontal);
-    printf("tMax: ");
-    tMax.print();
+    // printf("Gradient: %f\n", gradient);
+    // printf("Intersection with vertical at: (%d, %f)\n", nextVertical, intersectY);
+    // printf("Intersection with horizontal at: (%f, %d)\n", intersectX, nextHorizontal);
+    // printf("tMax: ");
+    // tMax.print();
 
     // TODO check length of line to see if the intersection point is in range.
 
     tDelta.x = edgeLength / (endPoint.x - startPoint.x);
-	tDelta.y = edgeLength / fabsf(endPoint.y - startPoint.y);
+    tDelta.y = edgeLength / fabsf(endPoint.y - startPoint.y);
 
     // Edge traversal, we traverse using the startPoint to save memory.
     while (startPoint.x < endCell.x + 1 && startPoint.y < endCell.y + step.y)
@@ -132,6 +133,55 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
             startPoint.y += step.y;
             tMax.y += tDelta.y;
         }
+    }
+}
+
+__global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize)
+{
+    GPUPoint edgeStart, edgeEnd;
+    GPUPoint testPoint;
+
+    // ID of current thread in reference to all created threads in kernel
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    // The number of threads in kernel
+    int stride = blockDim.x * gridDim.x;
+
+    // Run through the whole rasterization matrix using a grid-stride loop
+    for (int pixelID = index; pixelID < matrixSize; pixelID += stride)
+    {
+        if (poly.matrix[pixelID] == PARTIAL_COLOR) { continue; }
+
+        bool isInside = false;
+        int intersections = 0;
+
+        // Find current pixel coordinates
+        testPoint.x = pixelID % poly.mbrWidth;
+        testPoint.y = pixelID / poly.mbrWidth;
+
+        // Loop all edges
+        for (int j = 0; j < poly.size-1; j++)
+        {
+            // j = i (start)
+            // i = j+1 (end)
+            edgeStart = poly.points[j];
+            edgeEnd = poly.points[j+1];
+
+            // Check intersection with current edge
+            if (((edgeEnd.y > testPoint.y) != (edgeStart.y > testPoint.y)) &&
+                (testPoint.x < (edgeStart.x - edgeEnd.x) * (testPoint.y - edgeStart.y) /
+                (edgeStart.y - edgeEnd.y) + edgeStart.x))
+            {
+                isInside = !isInside;
+                intersections++;
+            }
+        }
+
+        poly.matrix[pixelID] = (isInside) ? FULL_COLOR : EMPTY_COLOR;
+        // if (pixelID == 29) 
+        // {
+        //     printf("Pixel %d intersections: %d\n", pixelID, intersections);
+        //     testPoint.print();
+        // }
     }
 }
 
@@ -161,7 +211,8 @@ void CUDARasterize(GPUPolygon &poly)
 
     preparePolygonMatrix<<<1, 1024>>>(*poly_D, poly.mbrHeight * poly.mbrWidth);
     rasterizeBorder<<<1, 4>>>(*poly_D);
-    // printPolygon<<<1, 1>>>(*poly_D);
+    fillPolygonPerPixel<<<1, 10>>>(*poly_D, poly.mbrHeight * poly.mbrWidth);
+    printPolygon<<<1, 1>>>(*poly_D);
 
     cudaDeviceSynchronize();
 
@@ -172,26 +223,26 @@ void CUDARasterize(GPUPolygon &poly)
 
 void calculateMBR(GPUPolygon &poly)
 {
-    poly.hMax = GPUPoint(poly.points[0].x, poly.points[0].y);
-    poly.hMin = GPUPoint(poly.points[0].x, poly.points[0].y);
+    poly.hMax = GPUPoint(poly.hilbertPoints[0].x, poly.hilbertPoints[0].y);
+    poly.hMin = GPUPoint(poly.hilbertPoints[0].x, poly.hilbertPoints[0].y);
 
     for (int i = 1; i < poly.size - 1; i++)
     {
-        if (poly.points[i].x < poly.hMin.x)
+        if (poly.hilbertPoints[i].x < poly.hMin.x)
         {
-            poly.hMin.x = poly.points[i].x;
+            poly.hMin.x = poly.hilbertPoints[i].x;
         }
-        if (poly.points[i].y < poly.hMin.y)
+        if (poly.hilbertPoints[i].y < poly.hMin.y)
         {
-            poly.hMin.y = poly.points[i].y;
+            poly.hMin.y = poly.hilbertPoints[i].y;
         }
-        if (poly.points[i].x > poly.hMax.x)
+        if (poly.hilbertPoints[i].x > poly.hMax.x)
         {
-            poly.hMax.x = poly.points[i].x;
+            poly.hMax.x = poly.hilbertPoints[i].x;
         }
-        if (poly.points[i].y > poly.hMax.y)
+        if (poly.hilbertPoints[i].y > poly.hMax.y)
         {
-            poly.hMax.y = poly.points[i].y;
+            poly.hMax.y = poly.hilbertPoints[i].y;
         }
     }
 
@@ -203,6 +254,16 @@ void calculateMBR(GPUPolygon &poly)
 
     poly.mbrWidth = poly.hMax.x - poly.hMin.x + 1;
     poly.mbrHeight = poly.hMax.y - poly.hMin.y + 1;
+}
+
+void normalizePoints(GPUPolygon &poly)
+{
+    for (int i = 0; i < poly.size; i++)
+    {
+        poly.points[i] = GPUPoint(
+            poly.hilbertPoints[i].x - poly.hMin.x,
+            poly.hilbertPoints[i].y - poly.hMin.y);
+    }
 }
 
 int main(void)
@@ -219,12 +280,14 @@ int main(void)
     calculateMBR(testPoly);
     // testPoly.mbrWidth = 5;
     // testPoly.mbrHeight = 3;
+    normalizePoints(testPoly);
     testPoly.matrix = new int[testPoly.mbrWidth * testPoly.mbrHeight];
 
-    testPoly.print();
+    // testPoly.print();
     // testPoly.printMatrix();
 
     CUDARasterize(testPoly);
+    // TODO move rasterization matrix to Hilbert space
 
     return 0;
 }

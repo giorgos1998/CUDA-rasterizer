@@ -49,7 +49,8 @@ __host__ __device__ void GPUPoint::print()
 __host__ __device__ GPUPolygon::GPUPolygon(int size, GPUPoint points[])
 {
     this->size = size;
-    this->points = points;
+    this->hilbertPoints = points;
+    this->points = new GPUPoint[size];
 }
 
 // Copy constructor
@@ -126,7 +127,21 @@ __host__ __device__ void GPUPolygon::printMatrix()
         {
             if (matrix[(i * mbrWidth) + j] == 3)
             {
-                printf(". ");
+                printf("? ");
+            }
+            else if (matrix[(i * mbrWidth) + j] == 0)
+            {
+                // printf(" ");
+                printf("\u00B7 ");
+            }
+            else if (matrix[(i * mbrWidth) + j] == 1)
+            {
+                printf("\U000025A0 ");
+                // printf("\U000025CF ");
+            }
+            else if (matrix[(i * mbrWidth) + j] == 2)
+            {
+                printf("\U000025A3 ");
             }
             else
             {

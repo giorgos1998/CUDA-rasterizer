@@ -18,7 +18,11 @@ class GPUPolygon
 {
 public:
     // NOTE: 1st point is the same as the last one.
+    // Normalized points based on MBR.
     GPUPoint *points;
+    // NOTE: 1st point is the same as the last one.
+    // Points in Hilbert space.
+    GPUPoint *hilbertPoints;
     int size;
     // Hilbert space polygon rasterization matrix
     int *matrix;
