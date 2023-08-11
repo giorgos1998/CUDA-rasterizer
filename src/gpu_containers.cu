@@ -151,3 +151,78 @@ __host__ __device__ void GPUPolygon::printMatrix()
         printf("\n");
     }
 }
+
+// Creates a new empty stack
+__host__ __device__ GPUStack::GPUStack()
+{
+    size = 0;
+    lastItem = NULL;
+}
+
+/**
+ * @brief Add an item in the stack.
+ * 
+ * @param x The X coordinate of the point to add.
+ * @param y The Y coordinate of the point to add.
+ */
+__host__ __device__ void GPUStack::push(int x, int y)
+{
+    GPUStackItem *item = new GPUStackItem;
+    item->point = GPUPoint(x, y);
+
+    item->prevItem = lastItem;
+    lastItem = item;
+    size++;
+
+    // printf("Added ");
+    // item->point.print();
+    // printf("Current item %p\n", item);
+    // printf("Previous item %p\n", item->prevItem);
+}
+
+// Removes and returns last item from the stack.
+__host__ __device__ GPUPoint GPUStack::pop()
+{
+    // Stop execution if trying to pop from empty stack
+    assert(size > 0);
+
+    // Copy poped item
+    GPUStackItem poped;
+    poped.point = GPUPoint(lastItem->point);
+    poped.prevItem = lastItem->prevItem;
+
+    // Delete poped item
+    lastItem->point.~GPUPoint();
+    delete lastItem;
+
+    // Change stack pointer & size
+    lastItem = poped.prevItem;
+    size--;
+
+    // printf("Removed ");
+    // poped.point.print();
+
+    return poped.point;
+}
+
+// Destructor
+__host__ __device__ GPUStack::~GPUStack()
+{
+    while (size > 0)
+    {
+        this->pop();
+    }
+}
+
+__host__ __device__ void GPUStack::print()
+{
+    GPUStackItem *currItem = lastItem;
+
+    printf("Current stack items:\n");
+    for (int i = size; i > 0; i--)
+    {
+        printf("%2d: ", i);
+        currItem->point.print();
+        currItem = currItem->prevItem;
+    }
+}

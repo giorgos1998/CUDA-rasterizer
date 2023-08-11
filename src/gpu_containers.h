@@ -40,4 +40,23 @@ public:
     __host__ __device__ void printMatrix();
 };
 
+struct GPUStackItem
+{
+    GPUPoint point;
+    GPUStackItem *prevItem;
+};
+
+class GPUStack
+{
+public:
+    int size;
+    GPUStackItem *lastItem;
+
+    __host__ __device__ GPUStack();
+    __host__ __device__ ~GPUStack();
+    __host__ __device__ GPUPoint pop();
+    __host__ __device__ void push(int x, int y);
+    __host__ __device__ void print();
+};
+
 #endif

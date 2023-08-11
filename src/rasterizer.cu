@@ -152,7 +152,7 @@ __global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize)
         if (poly.matrix[pixelID] == PARTIAL_COLOR) { continue; }
 
         bool isInside = false;
-        int intersections = 0;
+        // int intersections = 0;
 
         // Find current pixel coordinates
         testPoint.x = pixelID % poly.mbrWidth;
@@ -172,7 +172,7 @@ __global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize)
                 (edgeStart.y - edgeEnd.y) + edgeStart.x))
             {
                 isInside = !isInside;
-                intersections++;
+                // intersections++;
             }
         }
 
@@ -183,6 +183,16 @@ __global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize)
         //     testPoint.print();
         // }
     }
+}
+
+__global__ void floodFillPolygonInSectors(GPUPolygon &poly, int xSectors, int ySectors)
+{
+    GPUPoint sectorSize;
+
+    sectorSize.x = ceilf(poly.mbrWidth / xSectors);
+    sectorSize.y = ceilf(poly.mbrHeight / ySectors);
+
+    
 }
 
 void CUDARasterize(GPUPolygon &poly)
@@ -286,7 +296,7 @@ int main(void)
     // testPoly.print();
     // testPoly.printMatrix();
 
-    CUDARasterize(testPoly);
+    // CUDARasterize(testPoly);
     // TODO move rasterization matrix to Hilbert space
 
     return 0;
