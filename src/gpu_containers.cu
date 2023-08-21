@@ -94,6 +94,18 @@ __host__ __device__ GPUPolygon::~GPUPolygon()
     // printf("Deleting polygon\n");
 }
 
+// Get the value of rasterization matrix in given coordinates.
+__host__ __device__ int GPUPolygon::getMatrixXY(int x, int y)
+{
+    return matrix[y * mbrWidth + x];
+}
+
+// Set the value of rasterization matrix in given coordinates.
+__host__ __device__ void GPUPolygon::setMatrixXY(int x, int y, int value)
+{
+    matrix[y * mbrWidth + x] = value;
+}
+
 // Prints the polygon points.
 __host__ __device__ void GPUPolygon::print()
 {
@@ -120,32 +132,32 @@ __host__ __device__ void GPUPolygon::printMatrix()
         printf("%d ", i%10);
     }
     printf("\n");
-    for (int i = 0; i < mbrHeight; i++)
+    for (int y = 0; y < mbrHeight; y++)
     {
-        printf("%2d ", i);
-        for (int j = 0; j < mbrWidth; j++)
+        printf("%2d ", y);
+        for (int x = 0; x < mbrWidth; x++)
         {
-            if (matrix[(i * mbrWidth) + j] == 3)
+            if (this->getMatrixXY(x, y) == 3)
             {
                 printf("? ");
             }
-            else if (matrix[(i * mbrWidth) + j] == 0)
+            else if (this->getMatrixXY(x, y) == 0)
             {
                 // printf(" ");
                 printf("\u00B7 ");
             }
-            else if (matrix[(i * mbrWidth) + j] == 1)
+            else if (this->getMatrixXY(x, y) == 1)
             {
                 printf("\U000025A0 ");
                 // printf("\U000025CF ");
             }
-            else if (matrix[(i * mbrWidth) + j] == 2)
+            else if (this->getMatrixXY(x, y) == 2)
             {
                 printf("\U000025A3 ");
             }
             else
             {
-                printf("%d ", matrix[(i * mbrWidth) + j]);
+                printf("%d ", this->getMatrixXY(x, y));
             }
         }
         printf("\n");
@@ -160,7 +172,7 @@ __host__ __device__ GPUStack::GPUStack()
 }
 
 /**
- * @brief Add an item in the stack.
+ * @brief Add a point in the stack.
  * 
  * @param x The X coordinate of the point to add.
  * @param y The Y coordinate of the point to add.
@@ -180,7 +192,7 @@ __host__ __device__ void GPUStack::push(int x, int y)
     // printf("Previous item %p\n", item->prevItem);
 }
 
-// Removes and returns last item from the stack.
+// Removes and returns last point from the stack.
 __host__ __device__ GPUPoint GPUStack::pop()
 {
     // Stop execution if trying to pop from empty stack
@@ -203,6 +215,12 @@ __host__ __device__ GPUPoint GPUStack::pop()
     // poped.point.print();
 
     return poped.point;
+}
+
+// Checks if the stack still has points.
+__host__ __device__ bool GPUStack::hasItems()
+{
+    return size > 0;
 }
 
 // Destructor

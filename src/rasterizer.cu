@@ -22,8 +22,8 @@ const GPUPoint H_MIN = GPUPoint(0, 0);
 
 __global__ void printPolygon(GPUPolygon &poly)
 {
-    printf("Hello from the GPU!\n");
-    poly.print();
+    // printf("Hello from the GPU!\n");
+    // poly.print();
     poly.printMatrix();
 }
 
@@ -136,6 +136,34 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     }
 }
 
+__device__ bool isPointInsidePolygon(GPUPolygon &poly, GPUPoint testPoint)
+{
+    GPUPoint edgeStart, edgeEnd;
+
+    bool isInside = false;
+    // int intersections = 0;
+
+    // Loop all edges
+    for (int j = 0; j < poly.size-1; j++)
+    {
+        // j = i (start)
+        // i = j+1 (end)
+        edgeStart = poly.points[j];
+        edgeEnd = poly.points[j+1];
+
+        // Check intersection with current edge
+        if (((edgeEnd.y > testPoint.y) != (edgeStart.y > testPoint.y)) &&
+            (testPoint.x < (edgeStart.x - edgeEnd.x) * (testPoint.y - edgeStart.y) /
+            (edgeStart.y - edgeEnd.y) + edgeStart.x))
+        {
+            isInside = !isInside;
+            // intersections++;
+        }
+    }
+
+    return isInside;
+}
+
 __global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize)
 {
     GPUPoint edgeStart, edgeEnd;
@@ -151,48 +179,129 @@ __global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize)
     {
         if (poly.matrix[pixelID] == PARTIAL_COLOR) { continue; }
 
-        bool isInside = false;
-        // int intersections = 0;
-
         // Find current pixel coordinates
         testPoint.x = pixelID % poly.mbrWidth;
         testPoint.y = pixelID / poly.mbrWidth;
 
-        // Loop all edges
-        for (int j = 0; j < poly.size-1; j++)
-        {
-            // j = i (start)
-            // i = j+1 (end)
-            edgeStart = poly.points[j];
-            edgeEnd = poly.points[j+1];
+        poly.matrix[pixelID] =
+            (isPointInsidePolygon(poly, testPoint)) ? FULL_COLOR : EMPTY_COLOR;
+    }
+}
 
-            // Check intersection with current edge
-            if (((edgeEnd.y > testPoint.y) != (edgeStart.y > testPoint.y)) &&
-                (testPoint.x < (edgeStart.x - edgeEnd.x) * (testPoint.y - edgeStart.y) /
-                (edgeStart.y - edgeEnd.y) + edgeStart.x))
-            {
-                isInside = !isInside;
-                // intersections++;
-            }
+__device__ void floodFillSector(
+    GPUPolygon &poly, GPUPoint sectorMin, GPUPoint sectorMax,
+    GPUPoint fillPoint, int fillColor
+) {
+    GPUStack stack;
+    GPUPoint currPoint;
+    bool hasSpanAbove, hasSpanBelow;
+
+    stack.push(fillPoint.x, fillPoint.y);
+    
+    while (stack.hasItems())
+    {
+        currPoint = stack.pop();
+
+        // Go to the start of the line to begin painting.
+        while (
+            currPoint.x >= sectorMin.x &&
+            poly.getMatrixXY(currPoint.x, currPoint.y) == UNCERTAIN_COLOR
+        ) {
+            currPoint.x--;
         }
+        currPoint.x++;
+        hasSpanAbove = hasSpanBelow = false;
 
-        poly.matrix[pixelID] = (isInside) ? FULL_COLOR : EMPTY_COLOR;
-        // if (pixelID == 29) 
-        // {
-        //     printf("Pixel %d intersections: %d\n", pixelID, intersections);
-        //     testPoint.print();
-        // }
+        // Paint row & check above and below for new points.
+        while (
+            currPoint.x <= sectorMax.x &&
+            poly.getMatrixXY(currPoint.x, currPoint.y) == UNCERTAIN_COLOR
+        ) {
+            poly.setMatrixXY(currPoint.x, currPoint.y, fillColor);
+
+            // Mark the start of an uncertain span below current point.
+            if (
+                !hasSpanBelow &&
+                currPoint.y > sectorMin.y &&
+                poly.getMatrixXY(currPoint.x, currPoint.y - 1) == UNCERTAIN_COLOR
+            ) {
+                stack.push(currPoint.x, currPoint.y - 1);
+                hasSpanBelow = true;
+            }
+            // Mark the end of an uncertain span below current point.
+            else if (
+                hasSpanBelow &&
+                currPoint.y > sectorMin.y &&
+                poly.getMatrixXY(currPoint.x, currPoint.y - 1) != UNCERTAIN_COLOR
+            ) {
+                hasSpanBelow = false;
+            }
+
+            // Mark the start of an uncertain span above current point.
+            if (
+                !hasSpanAbove &&
+                currPoint.y < sectorMax.y &&
+                poly.getMatrixXY(currPoint.x, currPoint.y + 1) == UNCERTAIN_COLOR
+            ) {
+                stack.push(currPoint.x, currPoint.y + 1);
+                hasSpanAbove = true;
+            }
+            // Mark the end of an uncertain span above current point.
+            else if (
+                hasSpanAbove &&
+                currPoint.y < sectorMax.y &&
+                poly.getMatrixXY(currPoint.x, currPoint.y + 1) != UNCERTAIN_COLOR
+            ) {
+                hasSpanAbove = false;
+            }
+
+            currPoint.x++;
+        }
     }
 }
 
 __global__ void floodFillPolygonInSectors(GPUPolygon &poly, int xSectors, int ySectors)
 {
     GPUPoint sectorSize;
+    GPUPoint sectorMin, sectorMax, currPoint;
+    int fillColor;
 
-    sectorSize.x = ceilf(poly.mbrWidth / xSectors);
-    sectorSize.y = ceilf(poly.mbrHeight / ySectors);
+    sectorSize.x = ceilf(poly.mbrWidth / float(xSectors));
+    sectorSize.y = ceilf(poly.mbrHeight / float(ySectors));
 
-    
+    // ID of current thread in reference to all created threads in kernel.
+    int t_ID = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Find the first and last cell of each sector.
+    sectorMin.x = (t_ID % xSectors) * sectorSize.x;
+    sectorMin.y = (t_ID / xSectors) * sectorSize.y;
+    sectorMax.x = sectorMin.x + sectorSize.x - 1;
+    sectorMax.y = sectorMin.y + sectorSize.y - 1;
+
+    // Crop edge sectors if needed.
+    if (sectorMax.x >= poly.mbrWidth) {
+        sectorMax.x = poly.mbrWidth - 1;
+    }
+    if (sectorMax.y >= poly.mbrHeight) {
+        sectorMax.y = poly.mbrHeight - 1;
+    }
+
+    // Loop sector points to find not filled ones.
+    for (int y = sectorMin.y; y <= sectorMax.y; y++)
+    {
+        for (int x = sectorMin.x; x <= sectorMax.x; x++)
+        {
+            if (poly.getMatrixXY(x, y) == UNCERTAIN_COLOR)
+            {
+                currPoint.x = x;
+                currPoint.y = y;
+
+                fillColor = (isPointInsidePolygon(poly, currPoint)) ? FULL_COLOR : EMPTY_COLOR;
+
+                floodFillSector(poly, sectorMin, sectorMax, currPoint, fillColor);
+            }
+        }
+    }
 }
 
 void CUDARasterize(GPUPolygon &poly)
@@ -219,9 +328,18 @@ void CUDARasterize(GPUPolygon &poly)
     cudaMemcpy(&(poly_D->points), &points_D, sizeof(GPUPoint *), cudaMemcpyHostToDevice);
     cudaMemcpy(&(poly_D->matrix), &matrix_D, sizeof(int *), cudaMemcpyHostToDevice);
 
+    // Rasterize polygon using per pixel checks
     preparePolygonMatrix<<<1, 1024>>>(*poly_D, poly.mbrHeight * poly.mbrWidth);
     rasterizeBorder<<<1, 4>>>(*poly_D);
     fillPolygonPerPixel<<<1, 10>>>(*poly_D, poly.mbrHeight * poly.mbrWidth);
+    printPolygon<<<1, 1>>>(*poly_D);
+
+    cudaDeviceSynchronize();
+
+    // Rasterize polygon using flood fill per sector
+    preparePolygonMatrix<<<1, 1024>>>(*poly_D, poly.mbrHeight * poly.mbrWidth);
+    rasterizeBorder<<<1, 4>>>(*poly_D);
+    floodFillPolygonInSectors<<<1, 25>>>(*poly_D, 5, 5);
     printPolygon<<<1, 1>>>(*poly_D);
 
     cudaDeviceSynchronize();
@@ -296,7 +414,7 @@ int main(void)
     // testPoly.print();
     // testPoly.printMatrix();
 
-    // CUDARasterize(testPoly);
+    CUDARasterize(testPoly);
     // TODO move rasterization matrix to Hilbert space
 
     return 0;
