@@ -34,6 +34,18 @@ __host__ __device__ GPUPoint::~GPUPoint()
     // printf("Deleting point\n");
 }
 
+__host__ __device__ bool GPUPoint::operator==(const GPUPoint &that)
+{
+    if (this->x == that.x && this->y == that.y)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 // Prints the coordinates of the point.
 __host__ __device__ void GPUPoint::print()
 {
@@ -154,6 +166,7 @@ __host__ __device__ void GPUPolygon::printMatrix()
             else if (this->getMatrixXY(x, y) == 2)
             {
                 printf("\U000025A3 ");
+                // printf("\U000025EF ");
             }
             else
             {

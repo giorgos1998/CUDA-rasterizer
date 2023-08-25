@@ -42,20 +42,28 @@ __global__ void preparePolygonMatrix(GPUPolygon &poly, int mSize)
     }
 }
 
+__device__ bool checkYLimit(float testPointY, int endCellY, int stepY)
+{
+    if (stepY > 0) {
+        return (testPointY < endCellY + stepY);
+    } else {
+        return (testPointY > endCellY + stepY);
+    }
+}
+
 __global__ void rasterizeBorder(GPUPolygon &poly)
 {
     GPUPoint startPoint, endPoint;
     GPUPoint startCell, endCell;
     GPUPoint step;
     int nextVertical, nextHorizontal;
-    float gradient, edgeLength;
+    float gradient, edgeLength, intersectY, intersectX, distance;
     GPUPoint tMax, tDelta;
 
     // ID of current thread in reference to all created threads in kernel.
     int t_ID = blockIdx.x * blockDim.x + threadIdx.x;
 
     // Number of threads MUST be equal to the edges of the polygon.
-    // TODO improve a bit
     assert(t_ID < poly.size);
 
     // Find edge stard/end with positive orientation (on x axis).
@@ -79,6 +87,14 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     startCell.y = (int)startPoint.y;
     endCell.x = (int)endPoint.x;
     endCell.y = (int)endPoint.y;
+
+    // Check if edge is contained in only one cell.
+    if (startCell == endCell)
+    {
+        poly.setMatrixXY(startCell.x, startCell.y, PARTIAL_COLOR);
+        return;
+    }
+
     // printf("Starting cell: ");
     // startCell.print();
     // printf("Ending cell: ");
@@ -99,12 +115,16 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     edgeLength = sqrtf(powf(endPoint.x - startPoint.x, 2) + powf(endPoint.y - startPoint.y, 2));
 
     // Find intersection with nearest vertical & find tMax.
-    float intersectY = startPoint.y + (gradient * (nextVertical - startPoint.x));
-    tMax.x = sqrtf(powf(nextVertical - startPoint.x, 2) + powf(intersectY - startPoint.y, 2));
+    intersectY = startPoint.y + (gradient * (nextVertical - startPoint.x));
+    distance = sqrtf(powf(nextVertical - startPoint.x, 2) + powf(intersectY - startPoint.y, 2));
+    // Check if nearest vertical is in range of the edge.
+    tMax.x = (distance > edgeLength) ? edgeLength : distance;
 
     // Find intersection with nearest horizontal & find tMax.
-    float intersectX = ((nextHorizontal - startPoint.y) / gradient) + startPoint.x;
-    tMax.y = sqrtf(powf(intersectX - startPoint.x, 2) + powf(nextHorizontal - startPoint.y, 2));
+    intersectX = ((nextHorizontal - startPoint.y) / gradient) + startPoint.x;
+    distance = sqrtf(powf(intersectX - startPoint.x, 2) + powf(nextHorizontal - startPoint.y, 2));
+    // Check if nearest horizontal is in range of the edge.
+    tMax.y = (distance > edgeLength) ? edgeLength : distance;
 
     // printf("Gradient: %f\n", gradient);
     // printf("Intersection with vertical at: (%d, %f)\n", nextVertical, intersectY);
@@ -112,15 +132,13 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     // printf("tMax: ");
     // tMax.print();
 
-    // TODO check length of line to see if the intersection point is in range.
-
     tDelta.x = edgeLength / (endPoint.x - startPoint.x);
     tDelta.y = edgeLength / fabsf(endPoint.y - startPoint.y);
 
     // Edge traversal, we traverse using the startPoint to save memory.
-    while (startPoint.x < endCell.x + 1 && startPoint.y < endCell.y + step.y)
+    while (startPoint.x < endCell.x + 1 && checkYLimit(startPoint.y, endCell.y, step.y))
     {
-        poly.matrix[((int)startPoint.y * poly.mbrWidth) + (int)startPoint.x] = PARTIAL_COLOR;
+        poly.setMatrixXY((int)startPoint.x, (int)startPoint.y, PARTIAL_COLOR);
         // printf("Painted (%d, %d)\n", (int)startPoint.x, (int)startPoint.y);
 
         if (tMax.x < tMax.y)
@@ -297,6 +315,9 @@ __global__ void floodFillPolygonInSectors(GPUPolygon &poly, int xSectors, int yS
                 currPoint.y = y;
 
                 fillColor = (isPointInsidePolygon(poly, currPoint)) ? FULL_COLOR : EMPTY_COLOR;
+                
+                // Visualize sectors
+                // fillColor = (t_ID % 2) * 2;
 
                 floodFillSector(poly, sectorMin, sectorMax, currPoint, fillColor);
             }
@@ -396,7 +417,7 @@ void normalizePoints(GPUPolygon &poly)
 
 int main(void)
 {
-    // Create a test square
+    // Create a test polygon
     GPUPoint testPoints[5];
     testPoints[0] = GPUPoint(1.5, 1.5);
     testPoints[1] = GPUPoint(11.5, 21.5);

@@ -11,6 +11,7 @@ public:
     __host__ __device__ GPUPoint();
     __host__ __device__ GPUPoint(GPUPoint &that);
     __host__ __device__ ~GPUPoint();
+    __host__ __device__ bool operator==(const GPUPoint &that);
     __host__ __device__ void print();
 };
 
