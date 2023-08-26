@@ -15,14 +15,14 @@ __host__ __device__ GPUPoint::GPUPoint()
  * @param x The X coordinate.
  * @param y The Y coordinate.
  */
-__host__ __device__ GPUPoint::GPUPoint(float x, float y)
+__host__ __device__ GPUPoint::GPUPoint(double x, double y)
 {
     this->x = x;
     this->y = y;
 }
 
 // Copy constructor
-__host__ __device__ GPUPoint::GPUPoint(GPUPoint &that)
+__host__ __device__ GPUPoint::GPUPoint(const GPUPoint &that)
 {
     this->x = that.x;
     this->y = that.y;
@@ -58,23 +58,32 @@ __host__ __device__ void GPUPoint::print()
  * @param size The number of points (vertices) the polygon has.
  * @param points The array of points.
  */
-__host__ __device__ GPUPolygon::GPUPolygon(int size, GPUPoint points[])
+__host__ __device__ GPUPolygon::GPUPolygon(int id, int size, GPUPoint points[])
 {
+    this->id = id;
     this->size = size;
-    this->hilbertPoints = points;
+    this->hilbertPoints = new GPUPoint[size];
     this->points = new GPUPoint[size];
+
+    for (int i = 0; i < size; i++)
+    {
+        this->hilbertPoints[i] = points[i];
+    }
 }
 
 // Copy constructor
-__host__ __device__ GPUPolygon::GPUPolygon(GPUPolygon &that)
+__host__ __device__ GPUPolygon::GPUPolygon(const GPUPolygon &that)
 {
     // printf("In copy constructor\n");
 
+    this->id = that.id;
     this->size = that.size;
+    this->hilbertPoints = new GPUPoint[size];
     this->points = new GPUPoint[this->size];
 
     for (int i = 0; i < size; i++)
     {
+        this->hilbertPoints[i] = that.hilbertPoints[i];
         this->points[i] = that.points[i];
     }
 }
@@ -89,11 +98,14 @@ __host__ __device__ GPUPolygon &GPUPolygon::operator=(const GPUPolygon &that)
         // Stop execution if the polygons don't have the same size.
         assert(this->size == that.size);
 
+        this->id = that.id;
         this->size = that.size;
+        this->hilbertPoints = new GPUPoint[size];
         this->points = new GPUPoint[this->size];
 
         for (int i = 0; i < size; i++)
         {
+            this->hilbertPoints[i] = that.hilbertPoints[i];
             this->points[i] = that.points[i];
         }
     }
@@ -121,7 +133,7 @@ __host__ __device__ void GPUPolygon::setMatrixXY(int x, int y, int value)
 // Prints the polygon points.
 __host__ __device__ void GPUPolygon::print()
 {
-    printf("----- Polygon -----\n");
+    printf("----- Polygon %d -----\n", id);
     printf("Hilbert min: ");
     hMin.print();
     printf("Hilbert max: ");

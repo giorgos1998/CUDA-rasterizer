@@ -4,12 +4,12 @@
 class GPUPoint
 {
 public:
-    float x;
-    float y;
+    double x;
+    double y;
 
-    __host__ __device__ GPUPoint(float x, float y);
+    __host__ __device__ GPUPoint(double x, double y);
     __host__ __device__ GPUPoint();
-    __host__ __device__ GPUPoint(GPUPoint &that);
+    __host__ __device__ GPUPoint(const GPUPoint &that);
     __host__ __device__ ~GPUPoint();
     __host__ __device__ bool operator==(const GPUPoint &that);
     __host__ __device__ void print();
@@ -32,9 +32,10 @@ public:
     GPUPoint hMax;
     int mbrWidth;
     int mbrHeight;
+    int id;
 
-    __host__ __device__ GPUPolygon(int size, GPUPoint points[]);
-    __host__ __device__ GPUPolygon(GPUPolygon &that);
+    __host__ __device__ GPUPolygon(int id, int size, GPUPoint points[]);
+    __host__ __device__ GPUPolygon(const GPUPolygon &that);
     __host__ __device__ GPUPolygon& operator=(const GPUPolygon &that);
     __host__ __device__ ~GPUPolygon();
     __host__ __device__ int getMatrixXY(int x, int y);
