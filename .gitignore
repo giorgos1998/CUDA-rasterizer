@@ -1,5 +1,11 @@
+# Ignore temp files
 __pycache__/
 obj/
 bin/
 
+# Ignore compiled file
 app
+
+# Ignore datasets, they are to big to push
+T1NA_fixed.csv
+T1NA_mapped.csv
