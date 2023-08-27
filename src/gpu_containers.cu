@@ -138,10 +138,19 @@ __host__ __device__ void GPUPolygon::print()
     hMin.print();
     printf("Hilbert max: ");
     hMax.print();
-    printf("Points:\n");
-    for (int i = 0; i < size; i++)
+    printf("Matrix size (WxH): %dx%d\n", mbrWidth, mbrHeight);
+    printf("Polygon size: %d\n", size);
+    if (size > 20)
     {
-        points[i].print();
+        printf("Polygon is to large, not printing points.\n");
+    }
+    else
+    {
+        printf("Points:\n");
+        for (int i = 0; i < size; i++)
+        {
+            points[i].print();
+        }
     }
 }
 

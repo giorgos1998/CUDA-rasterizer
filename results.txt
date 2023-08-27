@@ -1,0 +1,91 @@
+Run before change in flood fill sectors
+
+ ------------- Average results: ------------
+ Dataset size: 			        123045 polygons
+ Total time (flood fill): 	    2.149092 ms
+ Total time (per cell fill): 	0.352949 ms
+ Memory transfer time: 		    0.106309 ms
+ Preparation time: 		        0.008850 ms
+ Border rasterization time: 	0.048795 ms
+ Fill time (flood fill): 	    1.963525 ms
+ Fill time (per cell fill): 	0.196326 ms
+
+Run after change in flood fill sectors
+
+ ------------- Average results: ------------
+ Dataset size: 			        123045 polygons
+ Total time (flood fill): 	    2.157208 ms
+ Total time (per cell fill): 	0.604823 ms
+ Memory transfer time: 		    0.108370 ms
+ Preparation time: 		        0.009671 ms
+ Border rasterization time: 	0.049763 ms
+ Fill time (flood fill): 	    1.964073 ms
+ Fill time (per cell fill): 	0.447506 ms
+
+Run after adding min/max
+
+ ------------- Average results: ------------
+ Dataset size: 			        123045 polygons
+ Total time (flood fill): 	    2.157184 ms
+ Total time (per cell fill): 	0.604415 ms
+ Memory transfer time: 		    0.108494 ms
+ Preparation time: 		        0.009552 ms
+ Border rasterization time: 	0.049744 ms
+ Fill time (flood fill): 	    1.963907 ms
+ Fill time (per cell fill): 	0.447467 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill): 	    0.240896 ms
+ Total time (per cell fill): 	0.127808 ms
+ Memory transfer time: 		    0.072640 ms
+ Preparation time: 		        0.004160 ms
+ Border rasterization time: 	0.001056 ms
+ Fill time (flood fill): 	    0.122816 ms
+ Fill time (per cell fill): 	0.008384 ms
+
+ ------------- Maximum results: ------------
+ Total time (flood fill): 	    175.624924 ms
+ Total time (per cell fill): 	126796.906250 ms
+ Memory transfer time: 		    16.823648 ms
+ Preparation time: 		        1.588320 ms
+ Border rasterization time: 	0.770336 ms
+ Fill time (flood fill): 	    165.656738 ms
+ Fill time (per cell fill): 	126778.664062 ms
+
+Run after sector change
+
+  ------------- Average results: ------------
+ Dataset size: 			        123045 polygons
+ Total time (flood fill): 	    0.384726 ms
+ Total time (per cell fill): 	2.124034 ms
+ Memory transfer time: 		    0.104418 ms
+ Preparation time: 		        0.008893 ms
+ Border rasterization time: 	0.049641 ms
+ Fill time (flood fill): 	    0.205723 ms
+ Fill time (per cell fill): 	1.962712 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill): 	    0.180672 ms
+ Total time (per cell fill): 	0.116000 ms
+ Memory transfer time: 		    0.075296 ms
+ Preparation time: 		        0.004192 ms
+ Border rasterization time: 	0.001056 ms
+ Fill time (flood fill): 	    0.055584 ms
+ Fill time (per cell fill): 	0.008000 ms
+
+ ------------- Maximum results: ------------
+ Total time (flood fill): 	    179.420227 ms
+ Total time (per cell fill): 	126755.703125 ms
+ Memory transfer time: 		    15.097120 ms
+ Preparation time: 		        1.585440 ms
+ Border rasterization time: 	0.769504 ms
+ Fill time (flood fill): 	    162.730209 ms
+ Fill time (per cell fill): 	126746.718750 ms
+
+Conclusions:
+ - Per cell fill better at small matrices
+ - Flood fill better at larger matrices
+ - Flood fill with large sectors -> bad at small matrices
+ - Flood fill with small sectors -> bad at larger matrices
+ - Flood fill with variable sectors -> almost identical with per cell at small
+matrices, way better at larger matrices 
