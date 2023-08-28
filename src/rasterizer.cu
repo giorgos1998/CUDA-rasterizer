@@ -455,11 +455,13 @@ void CUDARasterize(GPUPolygon &poly, bool useFloodFill, bool printMatrix, double
         
         // Rasterize polygon using flood fill per sector.
         floodFillPolygonInSectors<<<1, xSectors * ySectors>>>(*poly_D, xSectors, ySectors);
+        cudaEventRecord(fillStop);
+        results[5] = xSectors * ySectors;
     } else {
         // Rasterize polygon using per pixel checks.
         fillPolygonPerPixel<<<1, matrixThreads>>>(*poly_D, matrixSize);
+        cudaEventRecord(fillStop);
     }
-    cudaEventRecord(fillStop);
     // printf("Filled polygon\n");
 
     cudaEventRecord(totalStop);
@@ -615,12 +617,14 @@ __host__ void loadPolygonsFromCSV(int startLine, int endLine, std::vector<GPUPol
 int main(void)
 {
     std::vector<GPUPolygon> polygons;
-    int startLine = 0; // Start from 0
-    int endLine = 123044; // Max line: 123044
-    double runResults[5]; // total, memory, prep, border, fill
-    double avgResults[7]; // total(flood), total(/cell), memory, prep, border, fill(flood), fill(/cell)
+    int startLine = 0;      // Start from 0
+    int endLine = 123044;   // Max line: 123044
+    double runResults[6];   // total, memory, prep, border, fill, sector size
+    // total(flood), total(/cell), memory, prep, border, fill(flood), fill(/cell)
+    double avgResults[7];
     double minResults[7];
     double maxResults[7];
+    double datasetMetrics[3] = { 0, 0, 0 };
 
     // Prepare min and max result arrays
     for (int i = 0; i < 7; i++)
@@ -628,7 +632,7 @@ int main(void)
         minResults[i] = DBL_MAX;
         maxResults[i] = DBL_MIN;
     }
-    
+
     // Create a test polygon
     // GPUPoint testPoints[5];
     // testPoints[0] = GPUPoint(1.5, 1.5);
@@ -721,15 +725,20 @@ int main(void)
         if (runResults[3] > maxResults[4]) { maxResults[4] = runResults[3]; }
         if (runResults[4] > maxResults[6]) { maxResults[6] = runResults[4]; }
 
+        // Save metrics for the dataset
+        datasetMetrics[0] += polygons[i].size;
+        datasetMetrics[1] += polygons[i].mbrWidth * polygons[i].mbrHeight;
+        datasetMetrics[2] += runResults[5];
+
         printf("\rRasterized polygon %d of %d (ID: %d)", i, endLine - startLine, polygons[i].id);
     }
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "\n\nTotal dataset time: " << duration.count() << " ms" << std::endl;
     
     int numOfPolys = (endLine - startLine) + 1;
     printf("\n ------------- Average results: ------------\n");
-    printf(" Dataset size: \t\t\t%d polygons\n",     numOfPolys);
     printf(" Total time (flood fill): \t%f ms\n",    avgResults[0] / numOfPolys);
     printf(" Total time (per cell fill): \t%f ms\n", avgResults[1] / numOfPolys);
     printf(" Memory transfer time: \t\t%f ms\n",     avgResults[2] / (numOfPolys * 2));
@@ -755,6 +764,15 @@ int main(void)
     printf(" Border rasterization time: \t%f ms\n",     maxResults[4]);
     printf(" Fill time (flood fill): \t%f ms\n",        maxResults[5]);
     printf(" Fill time (per cell fill): \t%f ms\n\n",   maxResults[6]);
+
+    float avgMBR = datasetMetrics[1] / numOfPolys;
+    float avgSectors = datasetMetrics[2] / numOfPolys;
+    printf(" ------------- Dataset metrics: ------------\n");
+    printf(" Dataset size: \t\t\t%d polygons\n",            numOfPolys);
+    printf(" Average vetrices per polygon: \t%f vertices\n",datasetMetrics[0] / numOfPolys);
+    printf(" Average MBR per polygon: \t%f cells\n",        avgMBR);
+    printf(" Average sectors per polygon: \t%f sectors\n",  avgSectors);
+    printf(" Average sector size: \t\t%f cells\n\n",        avgMBR / avgSectors);
 
     // polygons[0].matrix = new int[polygons[0].mbrWidth * polygons[0].mbrHeight];
     // polygons[0].print();
