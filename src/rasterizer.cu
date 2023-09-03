@@ -35,9 +35,23 @@ const GPUPoint H_MIN = GPUPoint(0, 0);
 
 __global__ void printPolygon(GPUPolygon &poly)
 {
-    // printf("Hello from the GPU!\n");
-    // poly.print();
+    poly.print();
     poly.printMatrix();
+}
+
+__global__ void normalizePoints(GPUPolygon &poly)
+{
+    // ID of current thread in reference to all created threads in kernel
+    int t_ID = blockIdx.x * blockDim.x + threadIdx.x;
+    // The number of threads in kernel
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = t_ID; i < poly.size; i += stride)
+    {
+        poly.points[i] = GPUPoint(
+            poly.hilbertPoints[i].x - poly.hMin.x,
+            poly.hilbertPoints[i].y - poly.hMin.y);
+    }
 }
 
 __global__ void preparePolygonMatrix(GPUPolygon &poly, int mSize)
@@ -75,129 +89,133 @@ __global__ void rasterizeBorder(GPUPolygon &poly)
     // int checkID = 23;
 
     // ID of current thread in reference to all created threads in kernel.
-    int t_ID = blockIdx.x * blockDim.x + threadIdx.x;
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    // The number of threads in kernel
+    int stride = blockDim.x * gridDim.x;
 
-    // Number of threads MUST be equal to the edges of the polygon.
-    assert(t_ID < poly.size);
-
-    // Find edge stard/end with positive orientation (on x axis).
-    if (poly.points[t_ID].x < poly.points[t_ID + 1].x)
+    // Rasterize polygon border using a grid-stride loop.
+    for (int t_ID = index; t_ID < poly.size - 1; t_ID += stride)
     {
-        startPoint = GPUPoint(poly.points[t_ID]);
-        endPoint = GPUPoint(poly.points[t_ID + 1]);
-    }
-    else
-    {
-        startPoint = GPUPoint(poly.points[t_ID + 1]);
-        endPoint = GPUPoint(poly.points[t_ID]);
-    }
-    // printf("Edge %d\n", t_ID + 1);
-    // printf("Starting point: ");
-    // startPoint.print();
-    // printf("Ending point: ");
-    // endPoint.print();
-
-    startCell.x = (int)startPoint.x;
-    startCell.y = (int)startPoint.y;
-    endCell.x = (int)endPoint.x;
-    endCell.y = (int)endPoint.y;
-
-    // Check if edge is contained in only one cell.
-    if (startCell == endCell)
-    {
-        poly.setMatrixXY(startCell.x, startCell.y, PARTIAL_COLOR);
-        // printf("Thread %d stopped early at: (%d, %d)\n", t_ID, (int)startCell.x, (int)startCell.y);
-        return;
-    }
-    // else
-    // {
-    //     printf("Thread %d continued\n", t_ID);
-    // }
-    
-    // if (t_ID == checkID) {
-    //     printf("=============== Thread %d ==================\n", checkID);
-    //     printf("Starting point: ");
-    //     startPoint.print();
-    //     printf("Ending point: ");
-    //     endPoint.print();
-    //     printf("Starting cell: ");
-    //     startCell.print();
-    //     printf("Ending cell: ");
-    //     endCell.print();
-    // }
-
-    // Edge always goes from smaller X to larger.
-    step.x = 1;
-    step.y = endPoint.y > startPoint.y ? 1 : -1;
-    // if (t_ID == checkID) {
-    //     printf("Steps: ");
-    //     step.print();
-    // }
-
-    // Find nearest vertical & horizontal grid lines based on edge direction.
-    nextVertical = int(startPoint.x) + 1;
-    nextHorizontal = step.y == 1 ? int(startPoint.y) + 1 : int(startPoint.y);
-    // if (t_ID == checkID) {
-    //     printf("Next horizontal: %d, next vertical: %d\n", nextHorizontal, nextVertical);
-    // }
-
-    gradient = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
-    edgeLength = sqrt(pow(endPoint.x - startPoint.x, 2) + pow(endPoint.y - startPoint.y, 2));
-
-    // Find intersection with nearest vertical & find tMax.
-    intersectY = startPoint.y + (gradient * (nextVertical - startPoint.x));
-    distance = sqrt(pow(nextVertical - startPoint.x, 2) + pow(intersectY - startPoint.y, 2));
-    // Check if nearest vertical is in range of the edge.
-    tMax.x = (distance > edgeLength) ? edgeLength : distance;
-    // tMax.x = distance;
-
-    // Find intersection with nearest horizontal & find tMax.
-    intersectX = ((nextHorizontal - startPoint.y) / gradient) + startPoint.x;
-    distance = sqrt(pow(intersectX - startPoint.x, 2) + pow(nextHorizontal - startPoint.y, 2));
-    // Check if nearest horizontal is in range of the edge.
-    tMax.y = (distance > edgeLength) ? edgeLength : distance;
-    // tMax.y = distance;
-
-    // if (t_ID == checkID) {
-    //     printf("Gradient: %f\n", gradient);
-    //     printf("Intersection with vertical at: (%d, %f)\n", nextVertical, intersectY);
-    //     printf("Intersection with horizontal at: (%f, %d)\n", intersectX, nextHorizontal);
-    //     printf("tMax: ");
-    //     tMax.print();
-    // }
-
-    tDelta.x = edgeLength / (endPoint.x - startPoint.x);
-    tDelta.y = edgeLength / fabs(endPoint.y - startPoint.y);
-
-    // Edge traversal, we traverse using the startPoint to save memory.
-    while (startPoint.x < endCell.x + 1 && checkYLimit(startPoint.y, endCell.y, step.y))
-    {
-        poly.setMatrixXY((int)startPoint.x, (int)startPoint.y, PARTIAL_COLOR);
-        // if (t_ID == checkID) {
-        //     printf("Painted (%d, %d)\n", (int)startPoint.x, (int)startPoint.y);
-        //     printf("Current point: ");
-        //     startPoint.print();
-        //     printf("X check: %d, Y check: %d\n",
-        //         (startPoint.x < (endCell.x + 1)),
-        //         checkYLimit(startPoint.y, endCell.y, step.y)
-        //     );
-        // }
-
-        if (tMax.x < tMax.y)
+        // Find edge stard/end with positive orientation (on x axis).
+        if (poly.points[t_ID].x < poly.points[t_ID + 1].x)
         {
-            startPoint.x += step.x;
-            tMax.x += tDelta.x;
+            startPoint = GPUPoint(poly.points[t_ID]);
+            endPoint = GPUPoint(poly.points[t_ID + 1]);
         }
         else
         {
-            startPoint.y += step.y;
-            tMax.y += tDelta.y;
+            startPoint = GPUPoint(poly.points[t_ID + 1]);
+            endPoint = GPUPoint(poly.points[t_ID]);
         }
+        // printf("Edge %d\n", t_ID + 1);
+        // printf("Starting point: ");
+        // startPoint.print();
+        // printf("Ending point: ");
+        // endPoint.print();
+
+        startCell.x = (int)startPoint.x;
+        startCell.y = (int)startPoint.y;
+        endCell.x = (int)endPoint.x;
+        endCell.y = (int)endPoint.y;
+
+        // Check if edge is contained in only one cell.
+        if (startCell == endCell)
+        {
+            poly.setMatrixXY(startCell.x, startCell.y, PARTIAL_COLOR);
+            // printf("Thread %d stopped early at: (%d, %d)\n",
+                // t_ID, (int)startCell.x, (int)startCell.y);
+            return;
+        }
+        // else
+        // {
+        //     printf("Thread %d continued\n", t_ID);
+        // }
+        
+        // if (t_ID == checkID) {
+        //     printf("=============== Thread %d ==================\n", checkID);
+        //     printf("Starting point: ");
+        //     startPoint.print();
+        //     printf("Ending point: ");
+        //     endPoint.print();
+        //     printf("Starting cell: ");
+        //     startCell.print();
+        //     printf("Ending cell: ");
+        //     endCell.print();
+        // }
+
+        // Edge always goes from smaller X to larger.
+        step.x = 1;
+        step.y = endPoint.y > startPoint.y ? 1 : -1;
+        // if (t_ID == checkID) {
+        //     printf("Steps: ");
+        //     step.print();
+        // }
+
+        // Find nearest vertical & horizontal grid lines based on edge direction.
+        nextVertical = int(startPoint.x) + 1;
+        nextHorizontal = step.y == 1 ? int(startPoint.y) + 1 : int(startPoint.y);
+        // if (t_ID == checkID) {
+        //     printf("Next horizontal: %d, next vertical: %d\n", nextHorizontal, nextVertical);
+        // }
+
+        gradient = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+        edgeLength = sqrt(pow(endPoint.x - startPoint.x, 2) + pow(endPoint.y - startPoint.y, 2));
+
+        // Find intersection with nearest vertical & find tMax.
+        intersectY = startPoint.y + (gradient * (nextVertical - startPoint.x));
+        distance = sqrt(pow(nextVertical - startPoint.x, 2) + pow(intersectY - startPoint.y, 2));
+        // Check if nearest vertical is in range of the edge.
+        tMax.x = (distance > edgeLength) ? edgeLength : distance;
+        // tMax.x = distance;
+
+        // Find intersection with nearest horizontal & find tMax.
+        intersectX = ((nextHorizontal - startPoint.y) / gradient) + startPoint.x;
+        distance = sqrt(pow(intersectX - startPoint.x, 2) + pow(nextHorizontal - startPoint.y, 2));
+        // Check if nearest horizontal is in range of the edge.
+        tMax.y = (distance > edgeLength) ? edgeLength : distance;
+        // tMax.y = distance;
 
         // if (t_ID == checkID) {
-        //     printf("Moved point to: ");
-        //     startPoint.print();
+        //     printf("Gradient: %f\n", gradient);
+        //     printf("Intersection with vertical at: (%d, %f)\n", nextVertical, intersectY);
+        //     printf("Intersection with horizontal at: (%f, %d)\n", intersectX, nextHorizontal);
+        //     printf("tMax: ");
+        //     tMax.print();
         // }
+
+        tDelta.x = edgeLength / (endPoint.x - startPoint.x);
+        tDelta.y = edgeLength / fabs(endPoint.y - startPoint.y);
+
+        // Edge traversal, we traverse using the startPoint to save memory.
+        while (startPoint.x < endCell.x + 1 && checkYLimit(startPoint.y, endCell.y, step.y))
+        {
+            poly.setMatrixXY((int)startPoint.x, (int)startPoint.y, PARTIAL_COLOR);
+            // if (t_ID == checkID) {
+            //     printf("Painted (%d, %d)\n", (int)startPoint.x, (int)startPoint.y);
+            //     printf("Current point: ");
+            //     startPoint.print();
+            //     printf("X check: %d, Y check: %d\n",
+            //         (startPoint.x < (endCell.x + 1)),
+            //         checkYLimit(startPoint.y, endCell.y, step.y)
+            //     );
+            // }
+
+            if (tMax.x < tMax.y)
+            {
+                startPoint.x += step.x;
+                tMax.x += tDelta.x;
+            }
+            else
+            {
+                startPoint.y += step.y;
+                tMax.y += tDelta.y;
+            }
+
+            // if (t_ID == checkID) {
+            //     printf("Moved point to: ");
+            //     startPoint.print();
+            // }
+        }
     }
 }
 
@@ -386,11 +404,12 @@ void CUDARasterize(GPUPolygon &poly, bool useFloodFill, bool printMatrix, double
 
     // Pointers used by the device.
     GPUPolygon *poly_D;
-    GPUPoint *points_D;
+    GPUPoint *points_D, *Hpoints_D;
     int *matrix_D;
 
     int matrixSize = poly.mbrHeight * poly.mbrWidth;
     int matrixThreads = (matrixSize > 1024) ? 1024 : matrixSize;
+    int edgeThreads = (poly.size > 1024) ? 1024 : poly.size;
 
     // Initialize timing events.
     cudaEventCreate(&memoryStart);
@@ -416,7 +435,9 @@ void CUDARasterize(GPUPolygon &poly, bool useFloodFill, bool printMatrix, double
 
     // Copy points to device.
     cudaMalloc((void **)&points_D, poly.size * sizeof(GPUPoint));
-    cudaMemcpy(points_D, poly.points, poly.size * sizeof(GPUPoint), cudaMemcpyHostToDevice);
+    cudaMalloc((void **)&Hpoints_D, poly.size * sizeof(GPUPoint));
+    // cudaMemcpy(points_D, poly.points, poly.size * sizeof(GPUPoint), cudaMemcpyHostToDevice);
+    cudaMemcpy(Hpoints_D, poly.hilbertPoints, poly.size * sizeof(GPUPoint), cudaMemcpyHostToDevice);
     // printf("Points to device\n");
 
     // Copy polygon rasterization matrix to device.
@@ -427,27 +448,35 @@ void CUDARasterize(GPUPolygon &poly, bool useFloodFill, bool printMatrix, double
 
     // Set device polygon's pointers to copied points & matrix.
     cudaMemcpy(&(poly_D->points), &points_D, sizeof(GPUPoint *), cudaMemcpyHostToDevice);
+    cudaMemcpy(&(poly_D->hilbertPoints), &Hpoints_D, sizeof(GPUPoint *), cudaMemcpyHostToDevice);
     cudaMemcpy(&(poly_D->matrix), &matrix_D, sizeof(int *), cudaMemcpyHostToDevice);
     cudaEventRecord(memoryStop);
 
     // printf("Done with memory\n");
 
-    // Prepare rasterization matrix & rasterize border.
+    // Prepare polygon points & rasterization matrix.
     cudaEventRecord(prepStart);
+    normalizePoints<<<1, edgeThreads>>>(*poly_D);
     preparePolygonMatrix<<<1, matrixThreads>>>(*poly_D, matrixSize);
     cudaEventRecord(prepStop);
     // printf("Prepared matrix\n");
 
+    // Rasterize border.
     cudaEventRecord(borderStart);
-    rasterizeBorder<<<1, poly.size-1>>>(*poly_D);
+    edgeThreads = (poly.size - 1 > 1024) ? 1024 : poly.size - 1;
+    rasterizeBorder<<<1, edgeThreads>>>(*poly_D);
     cudaEventRecord(borderStop);
     // printf("Rasterized border\n");
 
     cudaEventRecord(fillStart);
     if (useFloodFill) {
-        // Keep sectors at 4-5 cells height & width.
+        // Use maximum amount of sectors.
         int xSectors = poly.mbrWidth;
         int ySectors = poly.mbrHeight;
+
+        // Keep sector size between 4-5 cells.
+        // int xSectors = ceilf(poly.mbrWidth / 5.0f);
+        // int ySectors = ceilf(poly.mbrHeight / 5.0f);
         
         // Max number of sectors is 32*32.
         if (xSectors > 32) { xSectors = 32; }
@@ -455,8 +484,10 @@ void CUDARasterize(GPUPolygon &poly, bool useFloodFill, bool printMatrix, double
         
         // Rasterize polygon using flood fill per sector.
         floodFillPolygonInSectors<<<1, xSectors * ySectors>>>(*poly_D, xSectors, ySectors);
+        // floodFillPolygonInSectors<<<1, 25>>>(*poly_D, 5, 5);
         cudaEventRecord(fillStop);
         results[5] = xSectors * ySectors;
+        // results[5] = 25;
     } else {
         // Rasterize polygon using per pixel checks.
         fillPolygonPerPixel<<<1, matrixThreads>>>(*poly_D, matrixSize);
@@ -473,8 +504,13 @@ void CUDARasterize(GPUPolygon &poly, bool useFloodFill, bool printMatrix, double
     // Wait for GPU to finish all the kernels.
     cudaDeviceSynchronize();
 
+    // Write back rasterization matrix to RAM.
+    // cudaMemcpy(poly.matrix, matrix_D, mSize, cudaMemcpyDeviceToHost);
+
+    // Free GPU memory used.
     cudaFree(poly_D);
     cudaFree(points_D);
+    cudaFree(Hpoints_D);
     cudaFree(matrix_D);
 
     // Wait for the last event to complete (just in case)
@@ -536,7 +572,7 @@ void calculateMBR(GPUPolygon &poly)
     poly.mbrHeight = poly.hMax.y - poly.hMin.y + 1;
 }
 
-void normalizePoints(GPUPolygon &poly)
+void normalizePointsCPU(GPUPolygon &poly)
 {
     for (int i = 0; i < poly.size; i++)
     {
@@ -643,8 +679,6 @@ int main(void)
 
     // GPUPolygon testPoly = GPUPolygon(1, 5, testPoints);
     // calculateMBR(testPoly);
-    // testPoly.mbrWidth = 5;
-    // testPoly.mbrHeight = 3;
     // normalizePoints(testPoly);
     // testPoly.matrix = new int[testPoly.mbrWidth * testPoly.mbrHeight];
 
@@ -655,10 +689,14 @@ int main(void)
     // testPoly.hilbertPoints[0].print();
     // testPoly.print();
     // testPoints[0].print();
+    // printf("Before rasterization on CPU\n");
     // testPoly.printMatrix();
 
-    // CUDARasterize(testPoly);
-    // TODO move rasterization matrix to Hilbert space
+    // CUDARasterize(testPoly, true, false, runResults);
+    // printf("Back to CPU\n");
+    // testPoly.printMatrix();
+
+    // return 0;
 
     // std::vector<GPUPoint> points;
     // points.push_back(GPUPoint(2, 3.7));
@@ -677,8 +715,11 @@ int main(void)
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i <= endLine - startLine; i++)
     {
+        printf("\rRasterizing polygon %d of %d (ID: %d)",
+            i, endLine - startLine, polygons[i].id);
+
         calculateMBR(polygons[i]);
-        normalizePoints(polygons[i]);
+        // normalizePointsCPU(polygons[i]);
         polygons[i].matrix = new int[polygons[i].mbrWidth * polygons[i].mbrHeight];
         // polygons[i].print();
         // polygons[i].printMatrix();
@@ -729,8 +770,6 @@ int main(void)
         datasetMetrics[0] += polygons[i].size;
         datasetMetrics[1] += polygons[i].mbrWidth * polygons[i].mbrHeight;
         datasetMetrics[2] += runResults[5];
-
-        printf("\rRasterized polygon %d of %d (ID: %d)", i, endLine - startLine, polygons[i].id);
     }
 
     auto stop = std::chrono::high_resolution_clock::now();
@@ -738,41 +777,52 @@ int main(void)
     std::cout << "\n\nTotal dataset time: " << duration.count() << " ms" << std::endl;
     
     int numOfPolys = (endLine - startLine) + 1;
-    printf("\n ------------- Average results: ------------\n");
-    printf(" Total time (flood fill): \t%f ms\n",    avgResults[0] / numOfPolys);
-    printf(" Total time (per cell fill): \t%f ms\n", avgResults[1] / numOfPolys);
-    printf(" Memory transfer time: \t\t%f ms\n",     avgResults[2] / (numOfPolys * 2));
-    printf(" Preparation time: \t\t%f ms\n",         avgResults[3] / (numOfPolys * 2));
-    printf(" Border rasterization time: \t%f ms\n",  avgResults[4] / (numOfPolys * 2));
-    printf(" Fill time (flood fill): \t%f ms\n",     avgResults[5] / numOfPolys);
-    printf(" Fill time (per cell fill): \t%f ms\n\n",avgResults[6] / numOfPolys);
+    printf("\n -------------- Total results: -------------\n");
+    printf(" Total time (flood fill): \t%10.3f ms\n",    avgResults[0]);
+    printf(" Total time (per cell fill): \t%10.3f ms\n", avgResults[1]);
+    printf(" Memory transfer time: \t\t%10.3f ms\n",     avgResults[2]);
+    printf(" Preparation time: \t\t%10.3f ms\n",         avgResults[3]);
+    printf(" Border rasterization time: \t%10.3f ms\n",  avgResults[4]);
+    printf(" Fill time (flood fill): \t%10.3f ms\n",     avgResults[5]);
+    printf(" Fill time (per cell fill): \t%10.3f ms\n",  avgResults[6]);
+    printf("Note: memory, preparation & border times are for both flood fill \
+and per cell runs\n\n");
+
+    printf(" ------------- Average results: ------------\n");
+    printf(" Total time (flood fill): \t%10.3f ms\n",    avgResults[0] / numOfPolys);
+    printf(" Total time (per cell fill): \t%10.3f ms\n", avgResults[1] / numOfPolys);
+    printf(" Memory transfer time: \t\t%10.3f ms\n",     avgResults[2] / (numOfPolys * 2));
+    printf(" Preparation time: \t\t%10.3f ms\n",         avgResults[3] / (numOfPolys * 2));
+    printf(" Border rasterization time: \t%10.3f ms\n",  avgResults[4] / (numOfPolys * 2));
+    printf(" Fill time (flood fill): \t%10.3f ms\n",     avgResults[5] / numOfPolys);
+    printf(" Fill time (per cell fill): \t%10.3f ms\n\n",avgResults[6] / numOfPolys);
 
     printf(" ------------- Minimum results: ------------\n");
-    printf(" Total time (flood fill): \t%f ms\n",       minResults[0]);
-    printf(" Total time (per cell fill): \t%f ms\n",    minResults[1]);
-    printf(" Memory transfer time: \t\t%f ms\n",        minResults[2]);
-    printf(" Preparation time: \t\t%f ms\n",            minResults[3]);
-    printf(" Border rasterization time: \t%f ms\n",     minResults[4]);
-    printf(" Fill time (flood fill): \t%f ms\n",        minResults[5]);
-    printf(" Fill time (per cell fill): \t%f ms\n\n",   minResults[6]);
+    printf(" Total time (flood fill): \t%10.3f ms\n",       minResults[0]);
+    printf(" Total time (per cell fill): \t%10.3f ms\n",    minResults[1]);
+    printf(" Memory transfer time: \t\t%10.3f ms\n",        minResults[2]);
+    printf(" Preparation time: \t\t%10.3f ms\n",            minResults[3]);
+    printf(" Border rasterization time: \t%10.3f ms\n",     minResults[4]);
+    printf(" Fill time (flood fill): \t%10.3f ms\n",        minResults[5]);
+    printf(" Fill time (per cell fill): \t%10.3f ms\n\n",   minResults[6]);
 
     printf(" ------------- Maximum results: ------------\n");
-    printf(" Total time (flood fill): \t%f ms\n",       maxResults[0]);
-    printf(" Total time (per cell fill): \t%f ms\n",    maxResults[1]);
-    printf(" Memory transfer time: \t\t%f ms\n",        maxResults[2]);
-    printf(" Preparation time: \t\t%f ms\n",            maxResults[3]);
-    printf(" Border rasterization time: \t%f ms\n",     maxResults[4]);
-    printf(" Fill time (flood fill): \t%f ms\n",        maxResults[5]);
-    printf(" Fill time (per cell fill): \t%f ms\n\n",   maxResults[6]);
+    printf(" Total time (flood fill): \t%10.3f ms\n",       maxResults[0]);
+    printf(" Total time (per cell fill): \t%10.3f ms\n",    maxResults[1]);
+    printf(" Memory transfer time: \t\t%10.3f ms\n",        maxResults[2]);
+    printf(" Preparation time: \t\t%10.3f ms\n",            maxResults[3]);
+    printf(" Border rasterization time: \t%10.3f ms\n",     maxResults[4]);
+    printf(" Fill time (flood fill): \t%10.3f ms\n",        maxResults[5]);
+    printf(" Fill time (per cell fill): \t%10.3f ms\n\n",   maxResults[6]);
 
     float avgMBR = datasetMetrics[1] / numOfPolys;
     float avgSectors = datasetMetrics[2] / numOfPolys;
     printf(" ------------- Dataset metrics: ------------\n");
-    printf(" Dataset size: \t\t\t%d polygons\n",            numOfPolys);
-    printf(" Average vetrices per polygon: \t%f vertices\n",datasetMetrics[0] / numOfPolys);
-    printf(" Average MBR per polygon: \t%f cells\n",        avgMBR);
-    printf(" Average sectors per polygon: \t%f sectors\n",  avgSectors);
-    printf(" Average sector size: \t\t%f cells\n\n",        avgMBR / avgSectors);
+    printf(" Dataset size: \t\t\t%10d polygons\n",              numOfPolys);
+    printf(" Average vetrices per polygon: \t%10.3f vertices\n",datasetMetrics[0] / numOfPolys);
+    printf(" Average MBR per polygon: \t%10.3f cells\n",        avgMBR);
+    printf(" Average sectors per polygon: \t%10.3f sectors\n",  avgSectors);
+    printf(" Average sector size: \t\t%10.3f cells\n\n",        avgMBR / avgSectors);
 
     // polygons[0].matrix = new int[polygons[0].mbrWidth * polygons[0].mbrHeight];
     // polygons[0].print();
