@@ -1,34 +1,26 @@
 #include <stdio.h>
 #include <assert.h>
-#include "gpu_containers.h"
 
-// Creates a new (0,0) point.
+#include "gpu_containers.cuh"
+
 __host__ __device__ GPUPoint::GPUPoint()
 {
     this->x = 0;
     this->y = 0;
 }
 
-/**
- * @brief Creates a new point with given coordinates.
- *
- * @param x The X coordinate.
- * @param y The Y coordinate.
- */
 __host__ __device__ GPUPoint::GPUPoint(double x, double y)
 {
     this->x = x;
     this->y = y;
 }
 
-// Copy constructor
 __host__ __device__ GPUPoint::GPUPoint(const GPUPoint &that)
 {
     this->x = that.x;
     this->y = that.y;
 }
 
-// Destructor
 __host__ __device__ GPUPoint::~GPUPoint()
 {
     // printf("Deleting point\n");
@@ -46,18 +38,15 @@ __host__ __device__ bool GPUPoint::operator==(const GPUPoint &that)
     }
 }
 
-// Prints the coordinates of the point.
-__host__ __device__ void GPUPoint::print()
+__host__ __device__ void GPUPoint::print(bool newLine)
 {
-    printf("(%f, %f)\n", x, y);
+    printf("(%7.3f, %7.3f)", x, y);
+    if (newLine)
+    {
+        printf("\n");
+    }
 }
 
-/**
- * @brief Creates a new Polygon that can be used from host and device.
- *
- * @param size The number of points (vertices) the polygon has.
- * @param points The array of points.
- */
 __host__ __device__ GPUPolygon::GPUPolygon(int id, int size, GPUPoint points[])
 {
     this->id = id;
@@ -71,7 +60,6 @@ __host__ __device__ GPUPolygon::GPUPolygon(int id, int size, GPUPoint points[])
     }
 }
 
-// Copy constructor
 __host__ __device__ GPUPolygon::GPUPolygon(const GPUPolygon &that)
 {
     // printf("In copy constructor\n");
@@ -88,7 +76,6 @@ __host__ __device__ GPUPolygon::GPUPolygon(const GPUPolygon &that)
     }
 }
 
-// Copy assignment operator
 __host__ __device__ GPUPolygon &GPUPolygon::operator=(const GPUPolygon &that)
 {
     // printf("In copy assignment operator\n");
@@ -112,28 +99,24 @@ __host__ __device__ GPUPolygon &GPUPolygon::operator=(const GPUPolygon &that)
     return *this;
 }
 
-// Destructor
 __host__ __device__ GPUPolygon::~GPUPolygon()
 {
     // printf("Deleting polygon\n");
 }
 
-// Get the value of rasterization matrix in given coordinates.
 __host__ __device__ int GPUPolygon::getMatrixXY(int x, int y)
 {
     return matrix[y * mbrWidth + x];
 }
 
-// Set the value of rasterization matrix in given coordinates.
 __host__ __device__ void GPUPolygon::setMatrixXY(int x, int y, int value)
 {
     matrix[y * mbrWidth + x] = value;
 }
 
-// Prints the polygon points.
 __host__ __device__ void GPUPolygon::print()
 {
-    printf("----- Polygon %d -----\n", id);
+    printf("---------- Polygon %d ----------\n", id);
     printf("Hilbert min: ");
     hMin.print();
     printf("Hilbert max: ");
@@ -146,15 +129,16 @@ __host__ __device__ void GPUPolygon::print()
     }
     else
     {
-        printf("Points:\n");
+        printf("Points:\t\t\tHilbert points:\n");
         for (int i = 0; i < size; i++)
         {
-            points[i].print();
+            points[i].print(false);
+            printf("\t");
+            hilbertPoints[i].print();
         }
     }
 }
 
-// Prints polygon's rasterization matrix.
 __host__ __device__ void GPUPolygon::printMatrix()
 {
     printf("Rasterization matrix:\n");
@@ -162,7 +146,7 @@ __host__ __device__ void GPUPolygon::printMatrix()
     printf("   ");
     for (int i = 0; i < mbrWidth; i++)
     {
-        printf("%d ", i%10);
+        printf("%d ", i % 10);
     }
     printf("\n");
     for (int y = 0; y < mbrHeight; y++)
@@ -198,19 +182,12 @@ __host__ __device__ void GPUPolygon::printMatrix()
     }
 }
 
-// Creates a new empty stack
 __host__ __device__ GPUStack::GPUStack()
 {
     size = 0;
     lastItem = NULL;
 }
 
-/**
- * @brief Add a point in the stack.
- * 
- * @param x The X coordinate of the point to add.
- * @param y The Y coordinate of the point to add.
- */
 __host__ __device__ void GPUStack::push(int x, int y)
 {
     GPUStackItem *item = new GPUStackItem;
@@ -226,7 +203,6 @@ __host__ __device__ void GPUStack::push(int x, int y)
     // printf("Previous item %p\n", item->prevItem);
 }
 
-// Removes and returns last point from the stack.
 __host__ __device__ GPUPoint GPUStack::pop()
 {
     // Stop execution if trying to pop from empty stack
@@ -251,13 +227,11 @@ __host__ __device__ GPUPoint GPUStack::pop()
     return poped.point;
 }
 
-// Checks if the stack still has points.
 __host__ __device__ bool GPUStack::hasItems()
 {
     return size > 0;
 }
 
-// Destructor
 __host__ __device__ GPUStack::~GPUStack()
 {
     while (size > 0)
