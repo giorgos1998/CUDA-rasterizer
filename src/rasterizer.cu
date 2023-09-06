@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <math.h>
-#include <assert.h>
 #include <float.h>
+#include <vector>
+#include <iostream>
 
 // CPU timing library
 #include <chrono>
@@ -165,8 +165,8 @@ void CUDARasterize(
 int main(void)
 {
     std::vector<GPUPolygon> polygons;
-    int startLine = 0;      // Start from 0
-    int endLine = 123044;   // Max line: 123044
+    int startLine = 1;      // Start from 1
+    int endLine = 3;   // Max line: 123045
     double runResults[6];   // total, memory, prep, border, fill, sector size
     // total(flood), total(/cell), memory, prep, border, fill(flood), fill(/cell)
     double avgResults[7];
@@ -186,26 +186,19 @@ int main(void)
     // testPoly.print();
     // testPoly.printMatrix();
 
-    // CUDARasterize(testPoly, false, true, runResults);
+    // CUDARasterize(testPoly, runResults, true);
     // testPoly.print();
     // testPoly.printMatrix();
     // return 0;
 
-    printf("Loading dataset...\n");
+    // Load polygons from dataset.
     loadPolygonsFromCSV(startLine, endLine, polygons);
-    printf("Dataset loaded!\n\n");
-    // printf("In main: \t%p\n", &(polygons[0].hilbertPoints[0]));
-    // for (int i = 0; i < polygons[0].size; i++)
-    // {
-    //     polygons[0].hilbertPoints[i].print();
-    // }
-    // polygons[0].hilbertPoints[polygons[0].size-1].print(); 
 
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i <= endLine - startLine; i++)
     {
         printf("\rRasterizing polygon %d of %d (ID: %d)",
-            i, endLine - startLine, polygons[i].id);
+            i + 1, endLine - startLine + 1, polygons[i].id);
 
         calculateMBR(polygons[i]);
         // normalizePointsCPU(polygons[i]);
@@ -313,9 +306,8 @@ and per cell runs\n\n");
     printf(" Average sectors per polygon: \t%10.3f sectors\n",  avgSectors);
     printf(" Average sector size: \t\t%10.3f cells\n\n",        avgMBR / avgSectors);
 
-    // polygons[0].matrix = new int[polygons[0].mbrWidth * polygons[0].mbrHeight];
-    // polygons[0].print();
-    // polygons[0].printMatrix();
+    // Write rasterization results to file.
+    writeResultsToCSV(polygons);
 
     return 0;
 }

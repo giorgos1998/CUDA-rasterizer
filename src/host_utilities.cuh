@@ -6,17 +6,14 @@
 #ifndef HOST_UTILITIES_H
 #define HOST_UTILITIES_H
 
-// Libraries for file reading
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <sstream>
-
 #include "gpu_containers.cuh"
 
-// Dataset file of polygons mapped to Hilbert space
-#define MAPPED_CSV "T1NA_mapped.csv"
+/** A struct that stores the Hilbert ID of a point and its rasterization value. */
+struct hilbertID
+{
+    int id;
+    int value;
+};
 
 /**
  * @brief Calculates given polygon's MBR (Minimum Bounding Rectangle).
@@ -45,5 +42,20 @@ __host__ void loadPolygonsFromCSV(
  * @returns The created polygon.
  */
 __host__ GPUPolygon createTestPoly(bool normalize = false);
+
+/**
+ * @brief Calculates a point's Hilbert ID based on its coordinates.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
+ * @returns The calculated Hilbert ID.
+ */
+__host__ int convertPointToHilbertID(int x, int y);
+
+/**
+ * @brief Writes rasterization results in ```OUTPUT_CSV``` file, overwriting
+ * previous results.
+ * @param polygons The list of polygons to write.
+ */
+__host__ void writeResultsToCSV(std::vector<GPUPolygon> &polygons);
 
 #endif
