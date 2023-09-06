@@ -1,7 +1,13 @@
+/**
+ * @file gpu_containers.cu
+ * @brief This file contains classes' functions used across the CUDA rasterizer.
+ */
+
 #include <stdio.h>
 #include <assert.h>
 
 #include "gpu_containers.cuh"
+#include "constants.h"
 
 __host__ __device__ GPUPoint::GPUPoint()
 {
@@ -141,8 +147,14 @@ __host__ __device__ void GPUPolygon::print()
 
 __host__ __device__ void GPUPolygon::printMatrix()
 {
-    printf("Rasterization matrix:\n");
-    printf("Size (WxH): %dx%d\n", mbrWidth, mbrHeight);
+    const char *uncertainSymbol = "?";
+    const char *emptySymbol = "\u00B7";
+    const char *partialSymbol = "\U000025A0";
+    const char *fullSymbol = "\U000025A3";
+
+    printf("Rasterization matrix (%dx%d):\n", mbrWidth, mbrHeight);
+    printf(" '%s': Uncertain \t'%s': Empty \t'%s': Partial \t'%s': Full\n",
+           uncertainSymbol, emptySymbol, partialSymbol, fullSymbol);
     printf("   ");
     for (int i = 0; i < mbrWidth; i++)
     {
@@ -154,23 +166,23 @@ __host__ __device__ void GPUPolygon::printMatrix()
         printf("%2d ", y);
         for (int x = 0; x < mbrWidth; x++)
         {
-            if (this->getMatrixXY(x, y) == 3)
+            if (this->getMatrixXY(x, y) == UNCERTAIN_COLOR)
             {
-                printf("? ");
+                printf("%s ", uncertainSymbol);
             }
-            else if (this->getMatrixXY(x, y) == 0)
+            else if (this->getMatrixXY(x, y) == EMPTY_COLOR)
             {
+                printf("%s ", emptySymbol);
                 // printf(" ");
-                printf("\u00B7 ");
             }
-            else if (this->getMatrixXY(x, y) == 1)
+            else if (this->getMatrixXY(x, y) == PARTIAL_COLOR)
             {
-                printf("\U000025A0 ");
+                printf("%s ", partialSymbol);
                 // printf("\U000025CF ");
             }
-            else if (this->getMatrixXY(x, y) == 2)
+            else if (this->getMatrixXY(x, y) == FULL_COLOR)
             {
-                printf("\U000025A3 ");
+                printf("%s ", fullSymbol);
                 // printf("\U000025EF ");
             }
             else
@@ -196,11 +208,6 @@ __host__ __device__ void GPUStack::push(int x, int y)
     item->prevItem = lastItem;
     lastItem = item;
     size++;
-
-    // printf("Added ");
-    // item->point.print();
-    // printf("Current item %p\n", item);
-    // printf("Previous item %p\n", item->prevItem);
 }
 
 __host__ __device__ GPUPoint GPUStack::pop()
@@ -220,9 +227,6 @@ __host__ __device__ GPUPoint GPUStack::pop()
     // Change stack pointer & size
     lastItem = poped.prevItem;
     size--;
-
-    // printf("Removed ");
-    // poped.point.print();
 
     return poped.point;
 }

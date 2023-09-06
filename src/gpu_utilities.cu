@@ -5,6 +5,8 @@
  */
 
 #include "gpu_utilities.cuh"
+#include "gpu_containers.cuh"
+#include "constants.h"
 
 __device__ bool checkYLimit(double testPointY, int endCellY, int stepY)
 {

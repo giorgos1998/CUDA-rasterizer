@@ -55,6 +55,7 @@ __global__ void fillPolygonPerPixel(GPUPolygon &poly, int matrixSize);
  * @param xSectors The number of sectors at the x axis.
  * @param ySectors The number of sectors at the y axis.
  */
-__global__ void floodFillPolygonInSectors(GPUPolygon &poly, int xSectors, int ySectors);
+__global__ void floodFillPolygonInSectors(
+    GPUPolygon &poly, int xSectors, int ySectors);
 
 #endif

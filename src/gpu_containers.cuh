@@ -1,15 +1,10 @@
+/**
+ * @file gpu_containers.cuh
+ * @brief This file contains classes and structs used across the CUDA rasterizer.
+ */
+
 #ifndef GPU_CONTAINERS_H
 #define GPU_CONTAINERS_H
-
-/** The value of the cells outside the polygon. */
-#define EMPTY_COLOR 0
-/** The value of the cells on the border of the polygon. */
-#define PARTIAL_COLOR 1
-/** The value of the cells inside the polygon. */
-#define FULL_COLOR 2
-/** The value of the unknown cells (not rasterized yet). */
-#define UNCERTAIN_COLOR 3
-#define FULL_CHECKED 4
 
 /** A class used to create points with (x,y) coordinates. */
 class GPUPoint

@@ -4,9 +4,10 @@
  * a new kernel at the GPU.
  */
 
-#include "gpu_containers.cuh"
 #include "kernels.cuh"
+#include "gpu_containers.cuh"
 #include "gpu_utilities.cuh"
+#include "constants.h"
 
 __global__ void printPolygon(GPUPolygon &poly)
 {
