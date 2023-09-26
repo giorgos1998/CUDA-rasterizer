@@ -1,6 +1,7 @@
 /**
  * @file constants.h
  * @brief This file contains constants used across the CUDA rasterizer.
+ * IMPORTANT: Use 'make clean' after changing a constant here.
  */
 
 #ifndef CONSTANTS_H
@@ -10,6 +11,8 @@
 #define MAPPED_CSV "T1NA_mapped.csv"
 /** Output file of rasterized polygons. */
 #define OUTPUT_CSV "rasterized.csv"
+/** Output file of run results ready to plot. */
+#define GRAPH_CSV "graph_results.csv"
 
 /** The value of the cells outside the polygon. */
 #define EMPTY_COLOR 0

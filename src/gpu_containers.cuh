@@ -6,6 +6,43 @@
 #ifndef GPU_CONTAINERS_H
 #define GPU_CONTAINERS_H
 
+
+/** A struct that stores the Hilbert ID of a point and its rasterization value. */
+struct hilbertID
+{
+    int id;
+    int value;
+};
+
+/** A struct that stores a timing value and with the Polygon ID it belongs to. */
+struct resultPoly
+{
+    int polyID;
+    double time;
+};
+
+/** A struct that stores the polygon ID with its fill timings. */
+struct multiresultPoly
+{
+    int polyID;
+    double floodTime;
+    double perCellTime;
+};
+
+/** A struct that stores the timing results of the rasterization. */
+struct timeMetrics
+{
+    resultPoly floodTotal;
+    resultPoly perCellTotal;
+    resultPoly hybridTotal;
+    resultPoly memory;
+    resultPoly preparation;
+    resultPoly border;
+    resultPoly floodFill;
+    resultPoly perCellFill;
+    resultPoly hybridFill;
+};
+
 /** A class used to create points with (x,y) coordinates. */
 class GPUPoint
 {

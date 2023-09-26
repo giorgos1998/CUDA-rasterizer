@@ -10,6 +10,8 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+// Library for double min/max
+#include <float.h>
 
 #include "host_utilities.cuh"
 #include "gpu_containers.cuh"
@@ -122,9 +124,9 @@ __host__ GPUPolygon createTestPoly(bool normalize)
 {
     GPUPoint testPoints[] = {
         GPUPoint(1.5, 1.5),
-        GPUPoint(11.5, 21.5),
-        GPUPoint(31.5, 31.5),
-        GPUPoint(21.5, 11.5),
+        GPUPoint(20.5, 45.5),
+        GPUPoint(62.5, 62.5),
+        GPUPoint(45.5, 20.5),
         GPUPoint(1.5, 1.5)};
     GPUPolygon poly = GPUPolygon(1, 5, testPoints);
 
@@ -226,4 +228,291 @@ __host__ void writeResultsToCSV(std::vector<GPUPolygon> &polygons)
     {
         printf("ERROR: output file could not be opened.\n");
     }
+}
+
+__host__ void gatherResults(
+    double *run, timeMetrics &avg, timeMetrics &min, timeMetrics &max,
+    int polyID, int fillMethod)
+{
+    // ---------------- Averages ----------------
+    if (fillMethod == 1)
+    {
+        // Flood fill
+        avg.floodTotal.time += run[0];
+        avg.floodFill.time += run[4];
+    }
+    else if (fillMethod == 2)
+    {
+        // Per cell fill
+        avg.perCellTotal.time += run[0];
+        avg.perCellFill.time += run[4];
+    }
+    else
+    {
+        // Hybrid fill
+        avg.hybridTotal.time += run[0];
+        avg.hybridFill.time += run[4];
+    }
+    avg.memory.time += run[1];
+    avg.preparation.time += run[2];
+    avg.border.time += run[3];
+
+    // ---------------- Minimums ----------------
+    if (fillMethod == 1)
+    {
+        // Flood fill
+        if (run[0] < min.floodTotal.time)
+        {
+            min.floodTotal.time = run[0];
+            min.floodTotal.polyID = polyID;
+        }
+        if (run[4] < min.floodFill.time)
+        {
+            min.floodFill.time = run[4];
+            min.floodFill.polyID = polyID;
+        }
+    }
+    else if (fillMethod == 2)
+    {
+        // Per cell fill
+        if (run[0] < min.perCellTotal.time)
+        {
+            min.perCellTotal.time = run[0];
+            min.perCellTotal.polyID = polyID;
+        }
+        if (run[4] < min.perCellFill.time)
+        {
+            min.perCellFill.time = run[4];
+            min.perCellFill.polyID = polyID;
+        }
+    }
+    else
+    {
+        // Hybrid fill
+        if (run[0] < min.hybridTotal.time)
+        {
+            min.hybridTotal.time = run[0];
+            min.hybridTotal.polyID = polyID;
+        }
+        if (run[4] < min.hybridFill.time)
+        {
+            min.hybridFill.time = run[4];
+            min.hybridFill.polyID = polyID;
+        }
+    }
+
+    if (run[1] < min.memory.time)
+    {
+        min.memory.time = run[1];
+        min.memory.polyID = polyID;
+    }
+    if (run[2] < min.preparation.time)
+    {
+        min.preparation.time = run[2];
+        min.preparation.polyID = polyID;
+    }
+    if (run[3] < min.border.time)
+    {
+        min.border.time = run[3];
+        min.border.polyID = polyID;
+    }
+
+    // ---------------- Maximums ----------------
+    if (fillMethod == 1)
+    {
+        // Flood fill
+        if (run[0] > max.floodTotal.time)
+        {
+            max.floodTotal.time = run[0];
+            max.floodTotal.polyID = polyID;
+        }
+        if (run[4] > max.floodFill.time)
+        {
+            max.floodFill.time = run[4];
+            max.floodFill.polyID = polyID;
+        }
+    }
+    else if (fillMethod == 2)
+    {
+        // Per cell fill
+        if (run[0] > max.perCellTotal.time)
+        {
+            max.perCellTotal.time = run[0];
+            max.perCellTotal.polyID = polyID;
+        }
+        if (run[4] > max.perCellFill.time)
+        {
+            max.perCellFill.time = run[4];
+            max.perCellFill.polyID = polyID;
+        }
+    }
+    else
+    {
+        // Hybrid fill
+        if (run[0] > max.hybridTotal.time)
+        {
+            max.hybridTotal.time = run[0];
+            max.hybridTotal.polyID = polyID;
+        }
+        if (run[4] > max.hybridFill.time)
+        {
+            max.hybridFill.time = run[4];
+            max.hybridFill.polyID = polyID;
+        }
+    }
+
+    if (run[1] > max.memory.time)
+    {
+        max.memory.time = run[1];
+        max.memory.polyID = polyID;
+    }
+    if (run[2] > max.preparation.time)
+    {
+        max.preparation.time = run[2];
+        max.preparation.polyID = polyID;
+    }
+    if (run[3] > max.border.time)
+    {
+        max.border.time = run[3];
+        max.border.polyID = polyID;
+    }
+}
+
+__host__ void printResults(
+    timeMetrics &avg, timeMetrics &min, timeMetrics &max, double *dataset,
+    int numOfPolys)
+{
+    printf("\n -------------- Total results: -------------\n");
+    printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time);
+    printf(" Total time (per cell fill):   %11.3f ms\n", avg.perCellTotal.time);
+    printf(" Total time (hybrid fill):     %11.3f ms\n", avg.hybridTotal.time);
+    printf(" Memory transfer time:         %11.3f ms\n", avg.memory.time);
+    printf(" Preparation time:             %11.3f ms\n", avg.preparation.time);
+    printf(" Border rasterization time:    %11.3f ms\n", avg.border.time);
+    printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time);
+    printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time);
+    printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time);
+    printf("Note: memory, preparation & border times are for both flood fill \
+and per cell runs\n\n");
+
+    printf(" ------------- Average results: ------------\n");
+    printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time / numOfPolys);
+    printf(" Total time (per cell fill):   %11.3f ms\n", avg.perCellTotal.time / numOfPolys);
+    printf(" Total time (hybrid fill):     %11.3f ms\n", avg.hybridTotal.time / numOfPolys);
+    printf(" Memory transfer time:         %11.3f ms\n", avg.memory.time / (numOfPolys * 2));
+    printf(" Preparation time:             %11.3f ms\n", avg.preparation.time / (numOfPolys * 2));
+    printf(" Border rasterization time:    %11.3f ms\n", avg.border.time / (numOfPolys * 2));
+    printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time / numOfPolys);
+    printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time / numOfPolys);
+    printf(" Fill time (hybrid fill):      %11.3f ms\n\n", avg.hybridFill.time / numOfPolys);
+
+    printf(" ------------- Minimum results: ------------\n");
+    printf(" Total time (flood fill):      %11.3f ms (ID: %d)\n", min.floodTotal.time, min.floodTotal.polyID);
+    printf(" Total time (per cell fill):   %11.3f ms (ID: %d)\n", min.perCellTotal.time, min.perCellTotal.polyID);
+    printf(" Total time (hybrid fill):     %11.3f ms (ID: %d)\n", min.hybridTotal.time, min.hybridTotal.polyID);
+    printf(" Memory transfer time:         %11.3f ms (ID: %d)\n", min.memory.time, min.memory.polyID);
+    printf(" Preparation time:             %11.3f ms (ID: %d)\n", min.preparation.time, min.preparation.polyID);
+    printf(" Border rasterization time:    %11.3f ms (ID: %d)\n", min.border.time, min.border.polyID);
+    printf(" Fill time (flood fill):       %11.3f ms (ID: %d)\n", min.floodFill.time, min.floodFill.polyID);
+    printf(" Fill time (per cell fill):    %11.3f ms (ID: %d)\n", min.perCellFill.time, min.perCellFill.polyID);
+    printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n\n", min.hybridFill.time, min.hybridFill.polyID);
+
+    printf(" ------------- Maximum results: ------------\n");
+    printf(" Total time (flood fill):      %11.3f ms (ID: %d)\n", max.floodTotal.time, max.floodTotal.polyID);
+    printf(" Total time (per cell fill):   %11.3f ms (ID: %d)\n", max.perCellTotal.time, max.perCellTotal.polyID);
+    printf(" Total time (hybrid fill):     %11.3f ms (ID: %d)\n", max.hybridTotal.time, max.hybridTotal.polyID);
+    printf(" Memory transfer time:         %11.3f ms (ID: %d)\n", max.memory.time, max.memory.polyID);
+    printf(" Preparation time:             %11.3f ms (ID: %d)\n", max.preparation.time, max.preparation.polyID);
+    printf(" Border rasterization time:    %11.3f ms (ID: %d)\n", max.border.time, max.border.polyID);
+    printf(" Fill time (flood fill):       %11.3f ms (ID: %d)\n", max.floodFill.time, max.floodFill.polyID);
+    printf(" Fill time (per cell fill):    %11.3f ms (ID: %d)\n", max.perCellFill.time, max.perCellFill.polyID);
+    printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n\n", max.hybridFill.time, max.hybridFill.polyID);
+
+    float avgMBR = dataset[1] / numOfPolys;
+    float avgSectors = dataset[2] / numOfPolys;
+    printf(" ------------- Dataset metrics: ------------\n");
+    printf(" Dataset size:                 %11d polygons\n", numOfPolys);
+    printf(" Average vetrices per polygon: %11.3f vertices\n", dataset[0] / numOfPolys);
+    printf(" Average MBR per polygon:      %11.3f cells\n", avgMBR);
+    printf(" Average sectors per polygon:  %11.3f sectors\n", avgSectors);
+    printf(" Average sector size:          %11.3f cells\n\n", avgMBR / avgSectors);
+}
+
+__host__ void writeGraphResults(multiresultPoly *results, int size)
+{
+    std::ofstream fout;
+
+    printf("Writing graph results to '%s'...\n", GRAPH_CSV);
+    fout.open(GRAPH_CSV, std::ios::trunc);
+    if (fout.is_open())
+    {
+        // Add header to file.
+        fout << "Polygon ID,Flood fill time (ms),Per cell fill time (ms)\n";
+
+        for (int i = 0; i < size; i++)
+        {
+            fout << results[i].polyID << ","
+                 << results[i].floodTime << ","
+                 << results[i].perCellTime << "\n";
+        }
+        fout.close();
+        printf("Writing completed!\n");
+    }
+    else
+    {
+        printf("ERROR: output file could not be opened.\n");
+    }
+}
+
+__host__ void initResultStructs(timeMetrics &avg, timeMetrics &min, timeMetrics &max)
+{
+    avg.floodTotal.time = 0;
+    avg.perCellTotal.time = 0;
+    avg.hybridTotal.time = 0;
+    avg.memory.time = 0;
+    avg.preparation.time = 0;
+    avg.border.time = 0;
+    avg.floodFill.time = 0;
+    avg.perCellFill.time = 0;
+    avg.hybridFill.time = 0;
+
+    min.floodTotal.time = DBL_MAX;
+    min.perCellTotal.time = DBL_MAX;
+    min.hybridTotal.time = DBL_MAX;
+    min.memory.time = DBL_MAX;
+    min.preparation.time = DBL_MAX;
+    min.border.time = DBL_MAX;
+    min.floodFill.time = DBL_MAX;
+    min.perCellFill.time = DBL_MAX;
+    min.hybridFill.time = DBL_MAX;
+
+    max.floodTotal.time = DBL_MIN;
+    max.perCellTotal.time = DBL_MIN;
+    max.hybridTotal.time = DBL_MIN;
+    max.memory.time = DBL_MIN;
+    max.preparation.time = DBL_MIN;
+    max.border.time = DBL_MIN;
+    max.floodFill.time = DBL_MIN;
+    max.perCellFill.time = DBL_MIN;
+    max.hybridFill.time = DBL_MIN;
+
+    min.floodTotal.polyID = -1;
+    min.perCellTotal.polyID = -1;
+    min.hybridTotal.polyID = -1;
+    min.memory.polyID = -1;
+    min.preparation.polyID = -1;
+    min.border.polyID = -1;
+    min.floodFill.polyID = -1;
+    min.perCellFill.polyID = -1;
+    min.hybridFill.polyID = -1;
+
+    max.floodTotal.polyID = -1;
+    max.perCellTotal.polyID = -1;
+    max.hybridTotal.polyID = -1;
+    max.memory.polyID = -1;
+    max.preparation.polyID = -1;
+    max.border.polyID = -1;
+    max.floodFill.polyID = -1;
+    max.perCellFill.polyID = -1;
+    max.hybridFill.polyID = -1;
 }

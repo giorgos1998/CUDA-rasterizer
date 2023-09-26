@@ -8,13 +8,6 @@
 
 #include "gpu_containers.cuh"
 
-/** A struct that stores the Hilbert ID of a point and its rasterization value. */
-struct hilbertID
-{
-    int id;
-    int value;
-};
-
 /**
  * @brief Calculates given polygon's MBR (Minimum Bounding Rectangle).
  * @param poly The target polygon.
@@ -57,5 +50,50 @@ __host__ int convertPointToHilbertID(int x, int y);
  * @param polygons The list of polygons to write.
  */
 __host__ void writeResultsToCSV(std::vector<GPUPolygon> &polygons);
+
+/**
+ * @brief Stores run results in given arrays to use them later.
+ * @param run The run results array.
+ * @param avg The averages array. The average is not calculated yet, it just
+ * stores the sum of the results.
+ * @param min The minimums array.
+ * @param max The maximums array.
+ * @param polyID The ID of the current polygon.
+ * @param fillMethod The fill method used.
+ * 1: Flood fill, 2: Per cell fill, 3: Hybrid algorithm.
+ */
+__host__ void gatherResults(
+    double *run, timeMetrics &avg, timeMetrics &min, timeMetrics &max,
+    int polyID, int fillMethod);
+
+/**
+ * @brief Prints the total results of the runs.
+ * @param avg The averages array. The average is not calculated yet, it just
+ * stores the sum of the results.
+ * @param min The minimums array.
+ * @param max The maximums array.
+ * @param dataset The dataset metrics array.
+ * @param numOfPolys The number of polygons in dataset.
+ */
+__host__ void printResults(
+    timeMetrics &avg, timeMetrics &min, timeMetrics &max, double *dataset,
+    int numOfPolys);
+
+/**
+ * @brief Writes timing results in plot-able format in ```GRAPH_CSV``` file,
+ * overwriting previous results.
+ * @param results The plot-able results array.
+ * @param size The size of the array.
+ */
+__host__ void writeGraphResults(multiresultPoly *results, int size);
+
+/**
+ * @brief Fills structs with the correct initial values.
+ * @param avg The averages struct.
+ * @param min The minimums struct.
+ * @param max The maximums struct.
+ */
+__host__ void initResultStructs(
+    timeMetrics &avg, timeMetrics &min, timeMetrics &max);
 
 #endif

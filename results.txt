@@ -184,3 +184,450 @@ matrices, way better at larger matrices
  Average MBR per polygon: 	    572.699 cells
  Average sectors per polygon: 	86.822 sectors
  Average sector size: 		    6.596 cells
+
+ ===================== After adding poly ID to min & max =======================
+ Total dataset time: 339241 ms
+
+ -------------- Total results: -------------
+ Total time (flood fill): 	   45260.396 ms
+ Total time (per cell fill): 	259361.907 ms
+ Memory transfer time: 		     15192.721 ms
+ Preparation time: 		          3773.163 ms
+ Border rasterization time: 	 12013.138 ms
+ Fill time (flood fill): 	     27519.235 ms
+ Fill time (per cell fill): 	244345.577 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill): 	  0.368 ms
+ Total time (per cell fill): 	2.108 ms
+ Memory transfer time: 		    0.062 ms
+ Preparation time: 		        0.015 ms
+ Border rasterization time: 	0.049 ms
+ Fill time (flood fill): 	    0.224 ms
+ Fill time (per cell fill): 	1.986 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill): 	  0.132 ms (ID: 53265)
+ Total time (per cell fill): 	0.077 ms (ID: 24918)
+ Memory transfer time: 		    0.036 ms (ID: 454)
+ Preparation time: 		        0.008 ms (ID: 123991)
+ Border rasterization time: 	0.010 ms (ID: 67096)
+ Fill time (flood fill): 	    0.054 ms (ID: 39739)
+ Fill time (per cell fill): 	0.008 ms (ID: 68466)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill): 	     389.161 ms (ID: 5847)
+ Total time (per cell fill): 	127588.336 ms (ID: 5847)
+ Memory transfer time: 		        14.897 ms (ID: 10582)
+ Preparation time: 		             1.617 ms (ID: 10582)
+ Border rasterization time: 	     2.142 ms (ID: 5847)
+ Fill time (flood fill): 	       371.925 ms (ID: 5847)
+ Fill time (per cell fill): 	127579.422 ms (ID: 5847)
+
+ ------------- Dataset metrics: ------------
+ Dataset size: 			              123045 polygons
+ Average vetrices per polygon: 	  25.442 vertices
+ Average MBR per polygon: 	     572.699 cells
+ Average sectors per polygon: 	  86.822 sectors
+ Average sector size: 		         6.596 cells
+
+======================== 4-edge polygon, MBR 32x32 =============================
+ -------------- Total results: -------------
+ Total time (flood fill):            1.449 ms
+ Total time (per cell fill):         0.207 ms
+ Memory transfer time:               0.172 ms
+ Preparation time:                   0.038 ms
+ Border rasterization time:          0.237 ms
+ Fill time (flood fill):             1.171 ms
+ Fill time (per cell fill):          0.025 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            1.449 ms
+ Total time (per cell fill):         0.207 ms
+ Memory transfer time:               0.086 ms
+ Preparation time:                   0.019 ms
+ Border rasterization time:          0.119 ms
+ Fill time (flood fill):             1.171 ms
+ Fill time (per cell fill):          0.025 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            1.449 ms (ID: 1)
+ Total time (per cell fill):         0.207 ms (ID: 1)
+ Memory transfer time:               0.048 ms (ID: 1)
+ Preparation time:                   0.014 ms (ID: 1)
+ Border rasterization time:          0.113 ms (ID: 1)
+ Fill time (flood fill):             1.171 ms (ID: 1)
+ Fill time (per cell fill):          0.025 ms (ID: 1)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):            1.449 ms (ID: 1)
+ Total time (per cell fill):         0.207 ms (ID: 1)
+ Memory transfer time:               0.124 ms (ID: 1)
+ Preparation time:                   0.024 ms (ID: 1)
+ Border rasterization time:          0.124 ms (ID: 1)
+ Fill time (flood fill):             1.171 ms (ID: 1)
+ Fill time (per cell fill):          0.025 ms (ID: 1)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:       5.000 vertices
+ Average MBR per polygon:         1024.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:                1.000 cells
+
+====================== 4-edge polygon, MBR 1024x1024 ===========================
+ -------------- Total results: -------------
+ Total time (flood fill):           48.814 ms
+ Total time (per cell fill):        15.987 ms
+ Memory transfer time:               3.496 ms
+ Preparation time:                   0.504 ms
+ Border rasterization time:          5.070 ms
+ Fill time (flood fill):            43.517 ms
+ Fill time (per cell fill):         12.198 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):           48.814 ms
+ Total time (per cell fill):        15.987 ms
+ Memory transfer time:               1.748 ms
+ Preparation time:                   0.252 ms
+ Border rasterization time:          2.535 ms
+ Fill time (flood fill):            43.517 ms
+ Fill time (per cell fill):         12.198 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):           48.814 ms (ID: -1)
+ Total time (per cell fill):        15.987 ms (ID: -1)
+ Memory transfer time:               0.977 ms (ID: -1)
+ Preparation time:                   0.233 ms (ID: -1)
+ Border rasterization time:          2.533 ms (ID: -1)
+ Fill time (flood fill):            43.517 ms (ID: -1)
+ Fill time (per cell fill):         12.198 ms (ID: -1)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):           48.814 ms (ID: -1)
+ Total time (per cell fill):        15.987 ms (ID: -1)
+ Memory transfer time:               2.520 ms (ID: -1)
+ Preparation time:                   0.271 ms (ID: -1)
+ Border rasterization time:          2.537 ms (ID: -1)
+ Fill time (flood fill):            43.517 ms (ID: -1)
+ Fill time (per cell fill):         12.198 ms (ID: -1)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:       5.000 vertices
+ Average MBR per polygon:      1048576.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:             1024.000 cells
+
+===================== 4-edge polygon, MBR 10222x10222 ==========================
+ -------------- Total results: -------------
+ Total time (flood fill):         1964.213 ms
+ Total time (per cell fill):      1206.120 ms
+ Memory transfer time:             245.250 ms
+ Preparation time:                  39.598 ms
+ Border rasterization time:         46.953 ms
+ Fill time (flood fill):          1741.738 ms
+ Fill time (per cell fill):       1096.776 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):         1964.213 ms
+ Total time (per cell fill):      1206.120 ms
+ Memory transfer time:             122.625 ms
+ Preparation time:                  19.799 ms
+ Border rasterization time:         23.477 ms
+ Fill time (flood fill):          1741.738 ms
+ Fill time (per cell fill):       1096.776 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):         1964.213 ms (ID: -1)
+ Total time (per cell fill):      1206.120 ms (ID: -1)
+ Memory transfer time:              68.653 ms (ID: -1)
+ Preparation time:                  18.612 ms (ID: -1)
+ Border rasterization time:         22.071 ms (ID: -1)
+ Fill time (flood fill):          1741.738 ms (ID: -1)
+ Fill time (per cell fill):       1096.776 ms (ID: -1)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):         1964.213 ms (ID: -1)
+ Total time (per cell fill):      1206.120 ms (ID: -1)
+ Memory transfer time:             176.598 ms (ID: -1)
+ Preparation time:                  20.986 ms (ID: -1)
+ Border rasterization time:         24.882 ms (ID: -1)
+ Fill time (flood fill):          1741.738 ms (ID: -1)
+ Fill time (per cell fill):       1096.776 ms (ID: -1)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:       5.000 vertices
+ Average MBR per polygon:    104489280.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:           102040.312 cells
+
+===================== 10-edge polygon, MBR 1024x1024 ===========================
+ -------------- Total results: -------------
+ Total time (flood fill):           65.194 ms
+ Total time (per cell fill):        21.557 ms
+ Memory transfer time:               3.352 ms
+ Preparation time:                   0.466 ms
+ Border rasterization time:          2.359 ms
+ Fill time (flood fill):            61.481 ms
+ Fill time (per cell fill):         19.076 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):           65.194 ms
+ Total time (per cell fill):        21.557 ms
+ Memory transfer time:               1.676 ms
+ Preparation time:                   0.233 ms
+ Border rasterization time:          1.180 ms
+ Fill time (flood fill):            61.481 ms
+ Fill time (per cell fill):         19.076 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):           65.194 ms (ID: 10)
+ Total time (per cell fill):        21.557 ms (ID: 10)
+ Memory transfer time:               1.065 ms (ID: 10)
+ Preparation time:                   0.230 ms (ID: 10)
+ Border rasterization time:          1.177 ms (ID: 10)
+ Fill time (flood fill):            61.481 ms (ID: 10)
+ Fill time (per cell fill):         19.076 ms (ID: 10)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):           65.194 ms (ID: 10)
+ Total time (per cell fill):        21.557 ms (ID: 10)
+ Memory transfer time:               2.287 ms (ID: 10)
+ Preparation time:                   0.235 ms (ID: 10)
+ Border rasterization time:          1.182 ms (ID: 10)
+ Fill time (flood fill):            61.481 ms (ID: 10)
+ Fill time (per cell fill):         19.076 ms (ID: 10)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:      11.000 vertices
+ Average MBR per polygon:      1048576.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:             1024.000 cells
+
+===================== 100-edge polygon, MBR 1024x1024 ==========================
+ -------------- Total results: -------------
+ Total time (flood fill):           58.966 ms
+ Total time (per cell fill):       123.372 ms
+ Memory transfer time:               3.382 ms
+ Preparation time:                   0.462 ms
+ Border rasterization time:          0.337 ms
+ Fill time (flood fill):            56.113 ms
+ Fill time (per cell fill):        122.029 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):           58.966 ms
+ Total time (per cell fill):       123.372 ms
+ Memory transfer time:               1.691 ms
+ Preparation time:                   0.231 ms
+ Border rasterization time:          0.169 ms
+ Fill time (flood fill):            56.113 ms
+ Fill time (per cell fill):        122.029 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):           58.966 ms (ID: 100)
+ Total time (per cell fill):       123.372 ms (ID: 100)
+ Memory transfer time:               0.938 ms (ID: 100)
+ Preparation time:                   0.228 ms (ID: 100)
+ Border rasterization time:          0.168 ms (ID: 100)
+ Fill time (flood fill):            56.113 ms (ID: 100)
+ Fill time (per cell fill):        122.029 ms (ID: 100)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):           58.966 ms (ID: 100)
+ Total time (per cell fill):       123.372 ms (ID: 100)
+ Memory transfer time:               2.443 ms (ID: 100)
+ Preparation time:                   0.234 ms (ID: 100)
+ Border rasterization time:          0.169 ms (ID: 100)
+ Fill time (flood fill):            56.113 ms (ID: 100)
+ Fill time (per cell fill):        122.029 ms (ID: 100)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:     101.000 vertices
+ Average MBR per polygon:      1048576.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:             1024.000 cells
+
+===================== 40-edge polygon, MBR 1024x1024 ===========================
+ -------------- Total results: -------------
+ Total time (flood fill):           56.653 ms
+ Total time (per cell fill):        56.710 ms
+ Memory transfer time:               3.378 ms
+ Preparation time:                   0.463 ms
+ Border rasterization time:          0.680 ms
+ Fill time (flood fill):            53.656 ms
+ Fill time (per cell fill):         55.169 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):           56.653 ms
+ Total time (per cell fill):        56.710 ms
+ Memory transfer time:               1.689 ms
+ Preparation time:                   0.231 ms
+ Border rasterization time:          0.340 ms
+ Fill time (flood fill):            53.656 ms
+ Fill time (per cell fill):         55.169 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):           56.653 ms (ID: 40)
+ Total time (per cell fill):        56.710 ms (ID: 40)
+ Memory transfer time:               0.967 ms (ID: 40)
+ Preparation time:                   0.228 ms (ID: 40)
+ Border rasterization time:          0.338 ms (ID: 40)
+ Fill time (flood fill):            53.656 ms (ID: 40)
+ Fill time (per cell fill):         55.169 ms (ID: 40)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):           56.653 ms (ID: 40)
+ Total time (per cell fill):        56.710 ms (ID: 40)
+ Memory transfer time:               2.411 ms (ID: 40)
+ Preparation time:                   0.234 ms (ID: 40)
+ Border rasterization time:          0.342 ms (ID: 40)
+ Fill time (flood fill):            53.656 ms (ID: 40)
+ Fill time (per cell fill):         55.169 ms (ID: 40)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:      41.000 vertices
+ Average MBR per polygon:      1048576.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:             1024.000 cells
+
+======================= 40-edge polygon, MBR 32x32 =============================
+ -------------- Total results: -------------
+ Total time (flood fill):            1.474 ms
+ Total time (per cell fill):         0.192 ms
+ Memory transfer time:               0.187 ms
+ Preparation time:                   0.040 ms
+ Border rasterization time:          0.106 ms
+ Fill time (flood fill):             1.249 ms
+ Fill time (per cell fill):          0.071 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            1.474 ms
+ Total time (per cell fill):         0.192 ms
+ Memory transfer time:               0.094 ms
+ Preparation time:                   0.020 ms
+ Border rasterization time:          0.053 ms
+ Fill time (flood fill):             1.249 ms
+ Fill time (per cell fill):          0.071 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            1.474 ms (ID: 41)
+ Total time (per cell fill):         0.192 ms (ID: 41)
+ Memory transfer time:               0.049 ms (ID: 41)
+ Preparation time:                   0.014 ms (ID: 41)
+ Border rasterization time:          0.050 ms (ID: 41)
+ Fill time (flood fill):             1.249 ms (ID: 41)
+ Fill time (per cell fill):          0.071 ms (ID: 41)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):            1.474 ms (ID: 41)
+ Total time (per cell fill):         0.192 ms (ID: 41)
+ Memory transfer time:               0.138 ms (ID: 41)
+ Preparation time:                   0.026 ms (ID: 41)
+ Border rasterization time:          0.055 ms (ID: 41)
+ Fill time (flood fill):             1.249 ms (ID: 41)
+ Fill time (per cell fill):          0.071 ms (ID: 41)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:      41.000 vertices
+ Average MBR per polygon:         1024.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:                1.000 cells
+
+======================= 40-edge polygon, MBR 64x64 =============================
+ -------------- Total results: -------------
+ Total time (flood fill):            2.827 ms
+ Total time (per cell fill):         0.393 ms
+ Memory transfer time:               0.192 ms
+ Preparation time:                   0.051 ms
+ Border rasterization time:          0.121 ms
+ Fill time (flood fill):             2.582 ms
+ Fill time (per cell fill):          0.259 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            2.827 ms
+ Total time (per cell fill):         0.393 ms
+ Memory transfer time:               0.096 ms
+ Preparation time:                   0.026 ms
+ Border rasterization time:          0.061 ms
+ Fill time (flood fill):             2.582 ms
+ Fill time (per cell fill):          0.259 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            2.827 ms (ID: 42)
+ Total time (per cell fill):         0.393 ms (ID: 42)
+ Memory transfer time:               0.054 ms (ID: 42)
+ Preparation time:                   0.015 ms (ID: 42)
+ Border rasterization time:          0.058 ms (ID: 42)
+ Fill time (flood fill):             2.582 ms (ID: 42)
+ Fill time (per cell fill):          0.259 ms (ID: 42)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):            2.827 ms (ID: 42)
+ Total time (per cell fill):         0.393 ms (ID: 42)
+ Memory transfer time:               0.139 ms (ID: 42)
+ Preparation time:                   0.036 ms (ID: 42)
+ Border rasterization time:          0.063 ms (ID: 42)
+ Fill time (flood fill):             2.582 ms (ID: 42)
+ Fill time (per cell fill):          0.259 ms (ID: 42)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:      41.000 vertices
+ Average MBR per polygon:         4096.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:                4.000 cells
+
+====================== 40-edge polygon, MBR 128x128 ============================
+ -------------- Total results: -------------
+ Total time (flood fill):            5.421 ms
+ Total time (per cell fill):         1.114 ms
+ Memory transfer time:               0.264 ms
+ Preparation time:                   0.047 ms
+ Border rasterization time:          0.157 ms
+ Fill time (flood fill):             5.117 ms
+ Fill time (per cell fill):          0.936 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            5.421 ms
+ Total time (per cell fill):         1.114 ms
+ Memory transfer time:               0.132 ms
+ Preparation time:                   0.024 ms
+ Border rasterization time:          0.079 ms
+ Fill time (flood fill):             5.117 ms
+ Fill time (per cell fill):          0.936 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            5.421 ms (ID: 43)
+ Total time (per cell fill):         1.114 ms (ID: 43)
+ Memory transfer time:               0.077 ms (ID: 43)
+ Preparation time:                   0.018 ms (ID: 43)
+ Border rasterization time:          0.076 ms (ID: 43)
+ Fill time (flood fill):             5.117 ms (ID: 43)
+ Fill time (per cell fill):          0.936 ms (ID: 43)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):            5.421 ms (ID: 43)
+ Total time (per cell fill):         1.114 ms (ID: 43)
+ Memory transfer time:               0.187 ms (ID: 43)
+ Preparation time:                   0.029 ms (ID: 43)
+ Border rasterization time:          0.081 ms (ID: 43)
+ Fill time (flood fill):             5.117 ms (ID: 43)
+ Fill time (per cell fill):          0.936 ms (ID: 43)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                           1 polygons
+ Average vetrices per polygon:      41.000 vertices
+ Average MBR per polygon:        16384.000 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:               16.000 cells
+
+
+ n = 0-33: 623487.0199105 * e^(-0.173287 * n)
+ n = 34-41: 26007.978835 * e^(-0.0770164 * n)
+ n = 42++: 3010.0162402 * e^(-0.0256721 * n)
