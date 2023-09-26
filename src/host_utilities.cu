@@ -256,6 +256,7 @@ __host__ void gatherResults(
     avg.memory.time += run[1];
     avg.preparation.time += run[2];
     avg.border.time += run[3];
+    avg.output.time += run[5];
 
     // ---------------- Minimums ----------------
     if (fillMethod == 1)
@@ -315,6 +316,11 @@ __host__ void gatherResults(
     {
         min.border.time = run[3];
         min.border.polyID = polyID;
+    }
+    if (run[5] < min.output.time)
+    {
+        min.output.time = run[5];
+        min.output.polyID = polyID;
     }
 
     // ---------------- Maximums ----------------
@@ -376,6 +382,11 @@ __host__ void gatherResults(
         max.border.time = run[3];
         max.border.polyID = polyID;
     }
+    if (run[5] > max.output.time)
+    {
+        max.output.time = run[5];
+        max.output.polyID = polyID;
+    }
 }
 
 __host__ void printResults(
@@ -386,47 +397,50 @@ __host__ void printResults(
     printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time);
     printf(" Total time (per cell fill):   %11.3f ms\n", avg.perCellTotal.time);
     printf(" Total time (hybrid fill):     %11.3f ms\n", avg.hybridTotal.time);
-    printf(" Memory transfer time:         %11.3f ms\n", avg.memory.time);
+    printf(" Data transfer time (to GPU):  %11.3f ms\n", avg.memory.time);
     printf(" Preparation time:             %11.3f ms\n", avg.preparation.time);
     printf(" Border rasterization time:    %11.3f ms\n", avg.border.time);
     printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time);
     printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time);
     printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time);
-    printf("Note: memory, preparation & border times are for both flood fill \
-and per cell runs\n\n");
+    printf(" Data transfer time (to CPU):  %11.3f ms\n", avg.output.time);
+    printf("Note: data, preparation & border times are for all 3 runs\n\n");
 
     printf(" ------------- Average results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time / numOfPolys);
     printf(" Total time (per cell fill):   %11.3f ms\n", avg.perCellTotal.time / numOfPolys);
     printf(" Total time (hybrid fill):     %11.3f ms\n", avg.hybridTotal.time / numOfPolys);
-    printf(" Memory transfer time:         %11.3f ms\n", avg.memory.time / (numOfPolys * 2));
-    printf(" Preparation time:             %11.3f ms\n", avg.preparation.time / (numOfPolys * 2));
-    printf(" Border rasterization time:    %11.3f ms\n", avg.border.time / (numOfPolys * 2));
+    printf(" Data transfer time (to GPU):  %11.3f ms\n", avg.memory.time / (numOfPolys * 3));
+    printf(" Preparation time:             %11.3f ms\n", avg.preparation.time / (numOfPolys * 3));
+    printf(" Border rasterization time:    %11.3f ms\n", avg.border.time / (numOfPolys * 3));
     printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time / numOfPolys);
     printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time / numOfPolys);
-    printf(" Fill time (hybrid fill):      %11.3f ms\n\n", avg.hybridFill.time / numOfPolys);
+    printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time / numOfPolys);
+    printf(" Data transfer time (to CPU):  %11.3f ms\n\n", avg.output.time / (numOfPolys * 3));
 
     printf(" ------------- Minimum results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms (ID: %d)\n", min.floodTotal.time, min.floodTotal.polyID);
     printf(" Total time (per cell fill):   %11.3f ms (ID: %d)\n", min.perCellTotal.time, min.perCellTotal.polyID);
     printf(" Total time (hybrid fill):     %11.3f ms (ID: %d)\n", min.hybridTotal.time, min.hybridTotal.polyID);
-    printf(" Memory transfer time:         %11.3f ms (ID: %d)\n", min.memory.time, min.memory.polyID);
+    printf(" Data transfer time (to GPU):  %11.3f ms (ID: %d)\n", min.memory.time, min.memory.polyID);
     printf(" Preparation time:             %11.3f ms (ID: %d)\n", min.preparation.time, min.preparation.polyID);
     printf(" Border rasterization time:    %11.3f ms (ID: %d)\n", min.border.time, min.border.polyID);
     printf(" Fill time (flood fill):       %11.3f ms (ID: %d)\n", min.floodFill.time, min.floodFill.polyID);
     printf(" Fill time (per cell fill):    %11.3f ms (ID: %d)\n", min.perCellFill.time, min.perCellFill.polyID);
-    printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n\n", min.hybridFill.time, min.hybridFill.polyID);
+    printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n", min.hybridFill.time, min.hybridFill.polyID);
+    printf(" Data transfer time (to CPU):  %11.3f ms (ID: %d)\n\n", min.output.time, min.output.polyID);
 
     printf(" ------------- Maximum results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms (ID: %d)\n", max.floodTotal.time, max.floodTotal.polyID);
     printf(" Total time (per cell fill):   %11.3f ms (ID: %d)\n", max.perCellTotal.time, max.perCellTotal.polyID);
     printf(" Total time (hybrid fill):     %11.3f ms (ID: %d)\n", max.hybridTotal.time, max.hybridTotal.polyID);
-    printf(" Memory transfer time:         %11.3f ms (ID: %d)\n", max.memory.time, max.memory.polyID);
+    printf(" Data transfer time (to GPU):  %11.3f ms (ID: %d)\n", max.memory.time, max.memory.polyID);
     printf(" Preparation time:             %11.3f ms (ID: %d)\n", max.preparation.time, max.preparation.polyID);
     printf(" Border rasterization time:    %11.3f ms (ID: %d)\n", max.border.time, max.border.polyID);
     printf(" Fill time (flood fill):       %11.3f ms (ID: %d)\n", max.floodFill.time, max.floodFill.polyID);
     printf(" Fill time (per cell fill):    %11.3f ms (ID: %d)\n", max.perCellFill.time, max.perCellFill.polyID);
-    printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n\n", max.hybridFill.time, max.hybridFill.polyID);
+    printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n", max.hybridFill.time, max.hybridFill.polyID);
+    printf(" Data transfer time (to CPU):  %11.3f ms (ID: %d)\n\n", max.output.time, max.output.polyID);
 
     float avgMBR = dataset[1] / numOfPolys;
     float avgSectors = dataset[2] / numOfPolys;
@@ -475,6 +489,7 @@ __host__ void initResultStructs(timeMetrics &avg, timeMetrics &min, timeMetrics 
     avg.floodFill.time = 0;
     avg.perCellFill.time = 0;
     avg.hybridFill.time = 0;
+    avg.output.time = 0;
 
     min.floodTotal.time = DBL_MAX;
     min.perCellTotal.time = DBL_MAX;
@@ -485,6 +500,7 @@ __host__ void initResultStructs(timeMetrics &avg, timeMetrics &min, timeMetrics 
     min.floodFill.time = DBL_MAX;
     min.perCellFill.time = DBL_MAX;
     min.hybridFill.time = DBL_MAX;
+    min.output.time = DBL_MAX;
 
     max.floodTotal.time = DBL_MIN;
     max.perCellTotal.time = DBL_MIN;
@@ -495,6 +511,7 @@ __host__ void initResultStructs(timeMetrics &avg, timeMetrics &min, timeMetrics 
     max.floodFill.time = DBL_MIN;
     max.perCellFill.time = DBL_MIN;
     max.hybridFill.time = DBL_MIN;
+    max.output.time = DBL_MIN;
 
     min.floodTotal.polyID = -1;
     min.perCellTotal.polyID = -1;
@@ -505,6 +522,7 @@ __host__ void initResultStructs(timeMetrics &avg, timeMetrics &min, timeMetrics 
     min.floodFill.polyID = -1;
     min.perCellFill.polyID = -1;
     min.hybridFill.polyID = -1;
+    min.output.polyID = -1;
 
     max.floodTotal.polyID = -1;
     max.perCellTotal.polyID = -1;
@@ -515,4 +533,5 @@ __host__ void initResultStructs(timeMetrics &avg, timeMetrics &min, timeMetrics 
     max.floodFill.polyID = -1;
     max.perCellFill.polyID = -1;
     max.hybridFill.polyID = -1;
+    max.output.polyID = -1;
 }

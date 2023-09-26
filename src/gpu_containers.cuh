@@ -41,6 +41,7 @@ struct timeMetrics
     resultPoly floodFill;
     resultPoly perCellFill;
     resultPoly hybridFill;
+    resultPoly output;
 };
 
 /** A class used to create points with (x,y) coordinates. */

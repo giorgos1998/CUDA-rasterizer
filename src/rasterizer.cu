@@ -21,12 +21,13 @@
  * @param printMatrix (Optional) Set to true to print the rasterization matrix.
  */
 void CUDARasterize(
-    GPUPolygon &poly, double* results, int fillMethod, bool printMatrix = false
-) {
+    GPUPolygon &poly, double* results, int fillMethod, bool printMatrix = false)
+{
     // Cuda events for timing.
     cudaEvent_t memoryStart, memoryStop, prepStart, prepStop, borderStart,
-        borderStop, fillStart, fillStop, totalStart, totalStop;
-    float memoryMs, prepMs, borderMs, fillMs, totalMs;
+        borderStop, fillStart, fillStop, outputStart, outputStop, totalStart,
+        totalStop;
+    float memoryMs, prepMs, borderMs, fillMs, outputMs, totalMs;
 
     // Pointers used by the device.
     GPUPolygon *poly_D;
@@ -46,6 +47,8 @@ void CUDARasterize(
     cudaEventCreate(&borderStop);
     cudaEventCreate(&fillStart);
     cudaEventCreate(&fillStop);
+    cudaEventCreate(&outputStart);
+    cudaEventCreate(&outputStop);
     cudaEventCreate(&totalStart);
     cudaEventCreate(&totalStop);
 
@@ -124,8 +127,8 @@ void CUDARasterize(
         // Max number of sectors is 32*32.
         if (xSectors > 32) { xSectors = 32; }
         if (ySectors > 32) { ySectors = 32; }
-        results[5] = xSectors * ySectors;
-        // results[5] = 25;
+        results[6] = xSectors * ySectors;
+        // results[6] = 25;
         
         // Rasterize polygon using flood fill per sector.
         floodFillPolygonInSectors<<<1, xSectors * ySectors>>>(
@@ -161,7 +164,7 @@ void CUDARasterize(
             // Max number of sectors is 32*32.
             if (xSectors > 32) { xSectors = 32; }
             if (ySectors > 32) { ySectors = 32; }
-            results[5] = xSectors * ySectors;
+            results[6] = xSectors * ySectors;
 
             floodFillPolygonInSectors<<<1, xSectors * ySectors>>>(
                 *poly_D, xSectors, ySectors);
@@ -174,8 +177,6 @@ void CUDARasterize(
     cudaEventRecord(fillStop);
     // printf("Filled polygon\n");
 
-    cudaEventRecord(totalStop);
-
     if (printMatrix) {
         printPolygon<<<1, 1>>>(*poly_D);
     }
@@ -184,7 +185,11 @@ void CUDARasterize(
     cudaDeviceSynchronize();
 
     // Write back rasterization matrix to RAM.
+    cudaEventRecord(outputStart);
     cudaMemcpy(poly.matrix, matrix_D, mSize, cudaMemcpyDeviceToHost);
+    cudaEventRecord(outputStop);
+
+    cudaEventRecord(totalStop);
 
     // Free GPU memory used.
     cudaFree(poly_D);
@@ -199,6 +204,7 @@ void CUDARasterize(
     cudaEventElapsedTime(&prepMs, prepStart, prepStop);
     cudaEventElapsedTime(&borderMs, borderStart, borderStop);
     cudaEventElapsedTime(&fillMs, fillStart, fillStop);
+    cudaEventElapsedTime(&outputMs, outputStart, outputStop);
     cudaEventElapsedTime(&totalMs, totalStart, totalStop);
 
     results[0] = totalMs;
@@ -206,6 +212,7 @@ void CUDARasterize(
     results[2] = prepMs;
     results[3] = borderMs;
     results[4] = fillMs;
+    results[5] = outputMs;
 
     // printf("\nPolygon %d timings (%s fill):\n",
     //     poly.id, useFloodFill ? "flood" : "per cell" );
@@ -221,7 +228,7 @@ int main(void)
     std::vector<GPUPolygon> polygons;
     int startLine = 1;      // Start from 1
     int endLine = 123045;   // Max line: 123045
-    double runResults[6];   // total, memory, prep, border, fill, sector size
+    double runResults[7];   // total, memory, prep, border, fill, output, sector size
     // total(flood), total(/cell), memory, prep, border, fill(flood), fill(/cell)
     timeMetrics avgResults;
     timeMetrics minResults;
@@ -276,7 +283,7 @@ int main(void)
         // Save metrics for the dataset
         datasetMetrics[0] += polygons[i].size;
         datasetMetrics[1] += polygons[i].mbrWidth * polygons[i].mbrHeight;
-        datasetMetrics[2] += runResults[5];
+        datasetMetrics[2] += runResults[6];
     }
 
     auto stop = std::chrono::high_resolution_clock::now();
