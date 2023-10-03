@@ -3,12 +3,15 @@ __pycache__/
 obj/
 bin/
 
-# Ignore compiled file
+# Ignore compiled files
 app
+app_serial
 
 # Ignore datasets, they are to big to push
 T1NA_fixed.csv
 T1NA_mapped.csv
 
-# Ignore results file
+# Ignore results files
 rasterized.csv
+rasterized_serial.csv
+graph_results.csv
