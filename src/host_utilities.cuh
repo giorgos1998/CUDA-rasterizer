@@ -42,7 +42,7 @@ __host__ GPUPolygon createTestPoly(bool normalize = false);
  * @param y The y coordinate.
  * @returns The calculated Hilbert ID.
  */
-__host__ int convertPointToHilbertID(int x, int y);
+__host__ uint convertPointToHilbertID(int x, int y);
 
 /**
  * @brief Writes rasterization results in ```OUTPUT_CSV``` file, overwriting

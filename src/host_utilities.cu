@@ -141,11 +141,11 @@ __host__ GPUPolygon createTestPoly(bool normalize)
     return poly;
 }
 
-__host__ int convertPointToHilbertID(int x, int y)
+__host__ uint convertPointToHilbertID(int x, int y)
 {
     // Function is copied by the serial code, no idea how it works.
-    int rx, ry, s;
-    int d = 0;
+    uint rx, ry, s;
+    uint d = 0;
 
     for (s = HILBERT_SIZE / 2; s > 0; s /= 2)
     {
@@ -403,7 +403,7 @@ __host__ void printResults(
     printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time);
     printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time);
     printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time);
-    printf(" Data transfer time (to CPU):  %11.3f ms\n", avg.output.time);
+    printf(" Data transfer time (to RAM):  %11.3f ms\n", avg.output.time);
     printf("Note: data, preparation & border times are for all 3 runs\n\n");
 
     printf(" ------------- Average results: ------------\n");
@@ -416,7 +416,7 @@ __host__ void printResults(
     printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time / numOfPolys);
     printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time / numOfPolys);
     printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time / numOfPolys);
-    printf(" Data transfer time (to CPU):  %11.3f ms\n\n", avg.output.time / (numOfPolys * 3));
+    printf(" Data transfer time (to RAM):  %11.3f ms\n\n", avg.output.time / (numOfPolys * 3));
 
     printf(" ------------- Minimum results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms (ID: %d)\n", min.floodTotal.time, min.floodTotal.polyID);
@@ -428,7 +428,7 @@ __host__ void printResults(
     printf(" Fill time (flood fill):       %11.3f ms (ID: %d)\n", min.floodFill.time, min.floodFill.polyID);
     printf(" Fill time (per cell fill):    %11.3f ms (ID: %d)\n", min.perCellFill.time, min.perCellFill.polyID);
     printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n", min.hybridFill.time, min.hybridFill.polyID);
-    printf(" Data transfer time (to CPU):  %11.3f ms (ID: %d)\n\n", min.output.time, min.output.polyID);
+    printf(" Data transfer time (to RAM):  %11.3f ms (ID: %d)\n\n", min.output.time, min.output.polyID);
 
     printf(" ------------- Maximum results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms (ID: %d)\n", max.floodTotal.time, max.floodTotal.polyID);
@@ -440,7 +440,7 @@ __host__ void printResults(
     printf(" Fill time (flood fill):       %11.3f ms (ID: %d)\n", max.floodFill.time, max.floodFill.polyID);
     printf(" Fill time (per cell fill):    %11.3f ms (ID: %d)\n", max.perCellFill.time, max.perCellFill.polyID);
     printf(" Fill time (hybrid fill):      %11.3f ms (ID: %d)\n", max.hybridFill.time, max.hybridFill.polyID);
-    printf(" Data transfer time (to CPU):  %11.3f ms (ID: %d)\n\n", max.output.time, max.output.polyID);
+    printf(" Data transfer time (to RAM):  %11.3f ms (ID: %d)\n\n", max.output.time, max.output.polyID);
 
     float avgMBR = dataset[1] / numOfPolys;
     float avgSectors = dataset[2] / numOfPolys;

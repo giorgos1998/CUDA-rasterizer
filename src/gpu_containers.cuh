@@ -10,7 +10,7 @@
 /** A struct that stores the Hilbert ID of a point and its rasterization value. */
 struct hilbertID
 {
-    int id;
+    uint id;
     int value;
 };
 
