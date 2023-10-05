@@ -63,16 +63,24 @@ __host__ void normalizePointsCPU(GPUPolygon &poly)
 }
 
 __host__ void loadPolygonsFromCSV(
-    int startLine, int endLine, std::vector<GPUPolygon> &polygons)
+    int startLine, int endLine, int dataset, std::vector<GPUPolygon> &polygons)
 {
     std::ifstream fin;
-    std::string line, token, coordToken;
+    std::string line, token, coordToken, filename;
     std::vector<GPUPoint> points;
     int polyID;
     double x, y;
 
-    printf("Loading dataset '%s'...\n", MAPPED_CSV);
-    fin.open(MAPPED_CSV);
+    if (dataset == 1) {
+        filename = MAPPED_CSV_1;
+    } else if (dataset == 2) {
+        filename = MAPPED_CSV_2;
+    } else {
+        filename = MAPPED_CSV_3;
+    }
+
+    printf("Loading dataset '%s'...\n", filename);
+    fin.open(filename);
 
     if (!fin.good())
     {
@@ -397,14 +405,13 @@ __host__ void printResults(
     printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time);
     printf(" Total time (per cell fill):   %11.3f ms\n", avg.perCellTotal.time);
     printf(" Total time (hybrid fill):     %11.3f ms\n", avg.hybridTotal.time);
-    printf(" Data transfer time (to GPU):  %11.3f ms\n", avg.memory.time);
-    printf(" Preparation time:             %11.3f ms\n", avg.preparation.time);
-    printf(" Border rasterization time:    %11.3f ms\n", avg.border.time);
+    printf(" Data transfer time (to GPU):  %11.3f ms\n", avg.memory.time / 3);
+    printf(" Preparation time:             %11.3f ms\n", avg.preparation.time / 3);
+    printf(" Border rasterization time:    %11.3f ms\n", avg.border.time / 3);
     printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time);
     printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time);
     printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time);
-    printf(" Data transfer time (to RAM):  %11.3f ms\n", avg.output.time);
-    printf("Note: data, preparation & border times are for all 3 runs\n\n");
+    printf(" Data transfer time (to RAM):  %11.3f ms\n", avg.output.time / 3);
 
     printf(" ------------- Average results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time / numOfPolys);

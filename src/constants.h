@@ -8,7 +8,9 @@
 #define CONSTANTS_H
 
 /** Dataset file of polygons mapped to Hilbert space. */
-#define MAPPED_CSV "T1NA_mapped.csv"
+#define MAPPED_CSV_1 "T1NA_mapped.csv"
+#define MAPPED_CSV_2 "T2NA_mapped.csv"
+#define MAPPED_CSV_3 "T3NA_mapped.csv"
 /** Output file of rasterized polygons. */
 #define OUTPUT_CSV "rasterized.csv"
 /** Output file of run results ready to plot. */

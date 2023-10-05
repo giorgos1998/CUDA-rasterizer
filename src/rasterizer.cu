@@ -227,14 +227,14 @@ int main(void)
 {
     std::vector<GPUPolygon> polygons;
     int startLine = 1;      // Start from 1
-    int endLine = 123045;   // Max line: 123045
+    int endLine = 123045;   // Max dataset line: 1: 123045, 2: 2252316, 3: 3043
     double runResults[7];   // total, memory, prep, border, fill, output, sector size
     // total(flood), total(/cell), memory, prep, border, fill(flood), fill(/cell)
     timeMetrics avgResults;
     timeMetrics minResults;
     timeMetrics maxResults;
     double datasetMetrics[3] = { 0, 0, 0 };
-    multiresultPoly graphResults[endLine - startLine + 1];
+    // multiresultPoly graphResults[endLine - startLine + 1];
 
     // Prepare min and max result structs
     initResultStructs(avgResults, minResults, maxResults);
@@ -250,7 +250,7 @@ int main(void)
     // return 0;
 
     // Load polygons from dataset.
-    loadPolygonsFromCSV(startLine, endLine, polygons);
+    loadPolygonsFromCSV(startLine, endLine, 1, polygons);
     // polygons.push_back(testPoly);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -262,17 +262,17 @@ int main(void)
         calculateMBR(polygons[i]);
         // normalizePointsCPU(polygons[i]);
         polygons[i].matrix = new int[polygons[i].mbrWidth * polygons[i].mbrHeight];
-        graphResults[i].polyID = polygons[i].id;
+        // graphResults[i].polyID = polygons[i].id;
 
         // Flood fill run
         CUDARasterize(polygons[i], runResults, 1);
         gatherResults(runResults, avgResults, minResults, maxResults, polygons[i].id, 1);
-        graphResults[i].floodTime = runResults[4];
+        // graphResults[i].floodTime = runResults[4];
 
         // Per cell check run
         CUDARasterize(polygons[i], runResults, 2);
         gatherResults(runResults, avgResults, minResults, maxResults, polygons[i].id, 2);
-        graphResults[i].perCellTime = runResults[4];
+        // graphResults[i].perCellTime = runResults[4];
         
         CUDARasterize(polygons[i], runResults, 3);
         gatherResults(runResults, avgResults, minResults, maxResults, polygons[i].id, 3);

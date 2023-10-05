@@ -24,10 +24,11 @@ __host__ void normalizePointsCPU(GPUPolygon &poly);
  * @brief Loads polygons from ```MAPPED_CSV``` file.
  * @param startLine The first line to start loading polygons from.
  * @param endLine The last line to load a polygon from (inclusive).
+ * @param dataset The TxNA dataset to choose, where x is the number.
  * @param polygons A list of polygons to load them to.
  */
 __host__ void loadPolygonsFromCSV(
-    int startLine, int endLine, std::vector<GPUPolygon> &polygons);
+    int startLine, int endLine, int dataset, std::vector<GPUPolygon> &polygons);
 
 /**
  * @brief Create a polygon for testing purposes.
