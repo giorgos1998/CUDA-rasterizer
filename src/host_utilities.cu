@@ -79,7 +79,7 @@ __host__ void loadPolygonsFromCSV(
         filename = MAPPED_CSV_3;
     }
 
-    printf("Loading dataset '%s'...\n", filename);
+    std::cout << "Loading dataset '" << filename << "'..." << std::endl;
     fin.open(filename);
 
     if (!fin.good())
@@ -411,7 +411,7 @@ __host__ void printResults(
     printf(" Fill time (flood fill):       %11.3f ms\n", avg.floodFill.time);
     printf(" Fill time (per cell fill):    %11.3f ms\n", avg.perCellFill.time);
     printf(" Fill time (hybrid fill):      %11.3f ms\n", avg.hybridFill.time);
-    printf(" Data transfer time (to RAM):  %11.3f ms\n", avg.output.time / 3);
+    printf(" Data transfer time (to RAM):  %11.3f ms\n\n", avg.output.time / 3);
 
     printf(" ------------- Average results: ------------\n");
     printf(" Total time (flood fill):      %11.3f ms\n", avg.floodTotal.time / numOfPolys);
@@ -451,12 +451,15 @@ __host__ void printResults(
 
     float avgMBR = dataset[1] / numOfPolys;
     float avgSectors = dataset[2] / numOfPolys;
+    float hybridFloodUsage = (dataset[3] / numOfPolys) * 100;
     printf(" ------------- Dataset metrics: ------------\n");
     printf(" Dataset size:                 %11d polygons\n", numOfPolys);
     printf(" Average vetrices per polygon: %11.3f vertices\n", dataset[0] / numOfPolys);
     printf(" Average MBR per polygon:      %11.3f cells\n", avgMBR);
     printf(" Average sectors per polygon:  %11.3f sectors\n", avgSectors);
-    printf(" Average sector size:          %11.3f cells\n\n", avgMBR / avgSectors);
+    printf(" Average sector size:          %11.3f cells\n", avgMBR / avgSectors);
+    printf(" Flood fill usage from hybrid: %11.1f %%\n", hybridFloodUsage);
+    printf(" Per cell usage from hybrid:   %11.1f %%\n\n", 100 - hybridFloodUsage);
 }
 
 __host__ void writeGraphResults(multiresultPoly *results, int size)

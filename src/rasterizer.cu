@@ -157,6 +157,7 @@ void CUDARasterize(
         }
 
         if (expression < meanMBR) {
+            results[7] = 1;
             // Use maximum amount of sectors.
             int xSectors = poly.mbrWidth;
             int ySectors = poly.mbrHeight;
@@ -170,6 +171,7 @@ void CUDARasterize(
                 *poly_D, xSectors, ySectors);
         }
         else {
+            results[7] = 2;
             fillPolygonPerPixel<<<1, matrixThreads>>>(*poly_D, matrixSize);
         }
         
@@ -226,15 +228,21 @@ void CUDARasterize(
 int main(void)
 {
     std::vector<GPUPolygon> polygons;
-    int startLine = 1;      // Start from 1
-    int endLine = 123045;   // Max dataset line: 1: 123045, 2: 2252316, 3: 3043
-    double runResults[7];   // total, memory, prep, border, fill, output, sector size
-    // total(flood), total(/cell), memory, prep, border, fill(flood), fill(/cell)
+    // int startLine = 1;      // Start from 1
+    int setSize = 123045;   // Max dataset size: 1: 123045, 2: 2252316, 3: 3043
+    int batch = 0;          // Start from 0
+    int batchSize = 400000;
+    int dataset = 1;
+
+    int batches = ceil((float)setSize / (float)batchSize);
+    int batchStart, batchEnd;
+    // total, memory, prep, border, fill, output, sector size, used fill (hybrid)
+    double runResults[8];
     timeMetrics avgResults;
     timeMetrics minResults;
     timeMetrics maxResults;
-    double datasetMetrics[3] = { 0, 0, 0 };
-    // multiresultPoly graphResults[endLine - startLine + 1];
+    double datasetMetrics[4] = { 0, 0, 0, 0 };
+    // multiresultPoly graphResults[setSize - startLine + 1];
 
     // Prepare min and max result structs
     initResultStructs(avgResults, minResults, maxResults);
@@ -249,15 +257,21 @@ int main(void)
     // testPoly.printMatrix();
     // return 0;
 
+    auto start = std::chrono::high_resolution_clock::now();
+
+    batchStart = (batch * batchSize) + 1;
+    batchEnd = (batch < batches - 1) ? (batch + 1) * batchSize : setSize;
+
+    printf("=========== Batch %d of %d ===========\n", batch + 1, batches);
+    printf("Start: %d, End: %d\n", batchStart, batchEnd);
     // Load polygons from dataset.
-    loadPolygonsFromCSV(startLine, endLine, 1, polygons);
+    loadPolygonsFromCSV(batchStart, batchEnd, dataset, polygons);
     // polygons.push_back(testPoly);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i <= endLine - startLine; i++)
+    for (int i = 0; i <= batchEnd - batchStart; i++)
     {
         printf("\rRasterizing polygon %d of %d (ID: %d)",
-            i + 1, endLine - startLine + 1, polygons[i].id);
+            i + batchStart, batchEnd, polygons[i].id);
 
         calculateMBR(polygons[i]);
         // normalizePointsCPU(polygons[i]);
@@ -284,15 +298,24 @@ int main(void)
         datasetMetrics[0] += polygons[i].size;
         datasetMetrics[1] += polygons[i].mbrWidth * polygons[i].mbrHeight;
         datasetMetrics[2] += runResults[6];
+        // Add 1 if flood fill was used by hybrid fill.
+        datasetMetrics[3] += (runResults[7] == 1) ? 1 : 0;
     }
+    printf("\nBatch rasterized!\n\n");
+    
+    for (int i = 0; i <= batchEnd - batchStart; i++)
+    {
+        delete[] polygons[i].matrix;
+    }
+    polygons.clear();
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "\n\nTotal dataset time: " << duration.count() << " ms" << std::endl;
     
-    int numOfPolys = (endLine - startLine) + 1;
+    int numOfPolys = (batchEnd - batchStart) + 1;
     printResults(avgResults, minResults, maxResults, datasetMetrics, numOfPolys);
-    // writeGraphResults(graphResults, endLine - startLine + 1);
+    // writeGraphResults(graphResults, setSize - startLine + 1);
 
     // Write rasterization results to file.
     // writeResultsToCSV(polygons);
