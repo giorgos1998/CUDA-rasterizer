@@ -1,0 +1,468 @@
+=================== Best settings, T1NA dataset ===================
+
+ -------------- Total results: -------------
+ Total time (flood fill):        48593.643 ms
+ Total time (per cell fill):    261168.922 ms
+ Total time (hybrid fill):       27674.898 ms
+ Data transfer time (to GPU):     7594.554 ms
+ Preparation time:                1721.888 ms
+ Border rasterization time:       5884.482 ms
+ Fill time (flood fill):         27566.557 ms
+ Fill time (per cell fill):     244225.615 ms
+ Fill time (hybrid fill):        11660.088 ms
+ Data transfer time (to RAM):     1286.167 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.395 ms
+ Total time (per cell fill):         2.123 ms
+ Total time (hybrid fill):           0.225 ms
+ Data transfer time (to GPU):        0.062 ms
+ Preparation time:                   0.014 ms
+ Border rasterization time:          0.048 ms
+ Fill time (flood fill):             0.224 ms
+ Fill time (per cell fill):          1.985 ms
+ Fill time (hybrid fill):            0.095 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.156 ms (ID: 83594)
+ Total time (per cell fill):         0.092 ms (ID: 826)
+ Total time (hybrid fill):           0.087 ms (ID: 25066)
+ Data transfer time (to GPU):        0.035 ms (ID: 10909)
+ Preparation time:                   0.008 ms (ID: 119770)
+ Border rasterization time:          0.010 ms (ID: 81498)
+ Fill time (flood fill):             0.054 ms (ID: 54699)
+ Fill time (per cell fill):          0.009 ms (ID: 39739)
+ Fill time (hybrid fill):            0.008 ms (ID: 107656)
+ Data transfer time (to RAM):        0.006 ms (ID: 28892)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):          420.105 ms (ID: 5847)
+ Total time (per cell fill):    127524.633 ms (ID: 5847)
+ Total time (hybrid fill):         391.173 ms (ID: 5847)
+ Data transfer time (to GPU):       17.003 ms (ID: 5847)
+ Preparation time:                   1.618 ms (ID: 10582)
+ Border rasterization time:          2.168 ms (ID: 5847)
+ Fill time (flood fill):           373.619 ms (ID: 5847)
+ Fill time (per cell fill):     127510.234 ms (ID: 5847)
+ Fill time (hybrid fill):          377.143 ms (ID: 5847)
+ Data transfer time (to RAM):       25.806 ms (ID: 5847)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      123045 polygons
+ Average vetrices per polygon:      25.442 vertices
+ Average MBR per polygon:          572.699 cells
+ Average sectors per polygon:       86.822 sectors
+ Average sector size:                6.596 cells
+ Flood fill usage from hybrid:         1.6 %
+ Per cell usage from hybrid:          98.4 %
+
+
+=================== Best settings, T2NA dataset ===================
+Batch 1
+ -------------- Total results: -------------
+ Total time (flood fill):       128256.975 ms
+ Total time (per cell fill):    145944.910 ms
+ Total time (hybrid fill):       80681.866 ms
+ Data transfer time (to GPU):    24725.043 ms
+ Preparation time:                5264.517 ms
+ Border rasterization time:      17024.373 ms
+ Fill time (flood fill):         67018.219 ms
+ Fill time (per cell fill):      90955.812 ms
+ Fill time (hybrid fill):        28973.010 ms
+ Data transfer time (to RAM):     4054.227 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.321 ms
+ Total time (per cell fill):         0.365 ms
+ Total time (hybrid fill):           0.202 ms
+ Data transfer time (to GPU):        0.062 ms
+ Preparation time:                   0.013 ms
+ Border rasterization time:          0.043 ms
+ Fill time (flood fill):             0.168 ms
+ Fill time (per cell fill):          0.227 ms
+ Fill time (hybrid fill):            0.072 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.153 ms (ID: 19110)
+ Total time (per cell fill):         0.093 ms (ID: 22822)
+ Total time (hybrid fill):           0.086 ms (ID: 22822)
+ Data transfer time (to GPU):        0.036 ms (ID: 107)
+ Preparation time:                   0.008 ms (ID: 74847)
+ Border rasterization time:          0.010 ms (ID: 28058)
+ Fill time (flood fill):             0.051 ms (ID: 401941)
+ Fill time (per cell fill):          0.009 ms (ID: 363854)
+ Fill time (hybrid fill):            0.008 ms (ID: 334310)
+ Data transfer time (to RAM):        0.006 ms (ID: 376531)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):          134.656 ms (ID: 282530)
+ Total time (per cell fill):      3593.568 ms (ID: 406140)
+ Total time (hybrid fill):         134.498 ms (ID: 282530)
+ Data transfer time (to GPU):        2.352 ms (ID: 127651)
+ Preparation time:                   0.319 ms (ID: 315247)
+ Border rasterization time:          0.888 ms (ID: 280391)
+ Fill time (flood fill):           132.938 ms (ID: 282530)
+ Fill time (per cell fill):       3591.769 ms (ID: 406140)
+ Fill time (hybrid fill):          133.244 ms (ID: 282530)
+ Data transfer time (to RAM):        3.346 ms (ID: 137251)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      400000 polygons
+ Average vetrices per polygon:      34.025 vertices
+ Average MBR per polygon:          154.110 cells
+ Average sectors per polygon:       45.449 sectors
+ Average sector size:                3.391 cells
+ Flood fill usage from hybrid:         1.7 %
+ Per cell usage from hybrid:          98.3 %
+
+Batch 2
+ -------------- Total results: -------------
+ Total time (flood fill):       109968.265 ms
+ Total time (per cell fill):    112298.579 ms
+ Total time (hybrid fill):       68081.691 ms
+ Data transfer time (to GPU):    24057.640 ms
+ Preparation time:                5230.959 ms
+ Border rasterization time:      15730.698 ms
+ Fill time (flood fill):         51209.574 ms
+ Fill time (per cell fill):      59297.366 ms
+ Fill time (hybrid fill):        18232.459 ms
+ Data transfer time (to RAM):     3954.322 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.275 ms
+ Total time (per cell fill):         0.281 ms
+ Total time (hybrid fill):           0.170 ms
+ Data transfer time (to GPU):        0.060 ms
+ Preparation time:                   0.013 ms
+ Border rasterization time:          0.039 ms
+ Fill time (flood fill):             0.128 ms
+ Fill time (per cell fill):          0.148 ms
+ Fill time (hybrid fill):            0.046 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.153 ms (ID: 429848)
+ Total time (per cell fill):         0.093 ms (ID: 409501)
+ Total time (hybrid fill):           0.088 ms (ID: 430796)
+ Data transfer time (to GPU):        0.035 ms (ID: 409649)
+ Preparation time:                   0.008 ms (ID: 537195)
+ Border rasterization time:          0.010 ms (ID: 430056)
+ Fill time (flood fill):             0.052 ms (ID: 728883)
+ Fill time (per cell fill):          0.009 ms (ID: 729212)
+ Fill time (hybrid fill):            0.008 ms (ID: 729182)
+ Data transfer time (to RAM):        0.006 ms (ID: 434307)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):           85.826 ms (ID: 413975)
+ Total time (per cell fill):      3934.835 ms (ID: 413975)
+ Total time (hybrid fill):          85.643 ms (ID: 413975)
+ Data transfer time (to GPU):        2.598 ms (ID: 428681)
+ Preparation time:                   0.211 ms (ID: 428681)
+ Border rasterization time:          0.742 ms (ID: 600673)
+ Fill time (flood fill):            82.146 ms (ID: 529859)
+ Fill time (per cell fill):       3933.016 ms (ID: 413975)
+ Fill time (hybrid fill):           83.856 ms (ID: 413975)
+ Data transfer time (to RAM):        3.087 ms (ID: 428681)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      400000 polygons
+ Average vetrices per polygon:      24.358 vertices
+ Average MBR per polygon:           84.063 cells
+ Average sectors per polygon:       26.885 sectors
+ Average sector size:                3.127 cells
+ Flood fill usage from hybrid:         0.8 %
+ Per cell usage from hybrid:          99.2 %
+
+Batch 3
+ -------------- Total results: -------------
+ Total time (flood fill):       130782.718 ms
+ Total time (per cell fill):    167518.042 ms
+ Total time (hybrid fill):       83465.880 ms
+ Data transfer time (to GPU):    24569.780 ms
+ Preparation time:                5265.442 ms
+ Border rasterization time:      16865.790 ms
+ Fill time (flood fill):         70075.649 ms
+ Fill time (per cell fill):     112731.278 ms
+ Fill time (hybrid fill):        31925.123 ms
+ Data transfer time (to RAM):     4067.476 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.327 ms
+ Total time (per cell fill):         0.419 ms
+ Total time (hybrid fill):           0.209 ms
+ Data transfer time (to GPU):        0.061 ms
+ Preparation time:                   0.013 ms
+ Border rasterization time:          0.042 ms
+ Fill time (flood fill):             0.175 ms
+ Fill time (per cell fill):          0.282 ms
+ Fill time (hybrid fill):            0.080 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.151 ms (ID: 881600)
+ Total time (per cell fill):         0.092 ms (ID: 864387)
+ Total time (hybrid fill):           0.088 ms (ID: 864344)
+ Data transfer time (to GPU):        0.036 ms (ID: 866291)
+ Preparation time:                   0.008 ms (ID: 986128)
+ Border rasterization time:          0.010 ms (ID: 1095612)
+ Fill time (flood fill):             0.051 ms (ID: 943441)
+ Fill time (per cell fill):          0.009 ms (ID: 1031528)
+ Fill time (hybrid fill):            0.008 ms (ID: 896947)
+ Data transfer time (to RAM):        0.006 ms (ID: 1026260)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):          173.076 ms (ID: 973042)
+ Total time (per cell fill):      4332.683 ms (ID: 1034095)
+ Total time (hybrid fill):         167.479 ms (ID: 849658)
+ Data transfer time (to GPU):        6.473 ms (ID: 971372)
+ Preparation time:                   0.630 ms (ID: 971372)
+ Border rasterization time:          1.264 ms (ID: 946407)
+ Fill time (flood fill):           166.844 ms (ID: 849658)
+ Fill time (per cell fill):       4330.333 ms (ID: 1034095)
+ Fill time (hybrid fill):          166.510 ms (ID: 849658)
+ Data transfer time (to RAM):       10.223 ms (ID: 971372)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      400000 polygons
+ Average vetrices per polygon:      33.960 vertices
+ Average MBR per polygon:          222.371 cells
+ Average sectors per polygon:       51.109 sectors
+ Average sector size:                4.351 cells
+ Flood fill usage from hybrid:         2.1 %
+ Per cell usage from hybrid:          97.9 %
+
+Batch 4
+ -------------- Total results: -------------
+ Total time (flood fill):       128322.202 ms
+ Total time (per cell fill):    142967.847 ms
+ Total time (hybrid fill):       75986.850 ms
+ Data transfer time (to GPU):    24501.189 ms
+ Preparation time:                5561.243 ms
+ Border rasterization time:      16967.457 ms
+ Fill time (flood fill):         63903.097 ms
+ Fill time (per cell fill):      89876.836 ms
+ Fill time (hybrid fill):        25906.275 ms
+ Data transfer time (to RAM):     3946.330 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.321 ms
+ Total time (per cell fill):         0.357 ms
+ Total time (hybrid fill):           0.190 ms
+ Data transfer time (to GPU):        0.061 ms
+ Preparation time:                   0.014 ms
+ Border rasterization time:          0.042 ms
+ Fill time (flood fill):             0.160 ms
+ Fill time (per cell fill):          0.225 ms
+ Fill time (hybrid fill):            0.065 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.152 ms (ID: 1352233)
+ Total time (per cell fill):         0.093 ms (ID: 1229659)
+ Total time (hybrid fill):           0.087 ms (ID: 1224360)
+ Data transfer time (to GPU):        0.035 ms (ID: 1225930)
+ Preparation time:                   0.008 ms (ID: 1374022)
+ Border rasterization time:          0.010 ms (ID: 1300633)
+ Fill time (flood fill):             0.051 ms (ID: 1284695)
+ Fill time (per cell fill):          0.009 ms (ID: 1392294)
+ Fill time (hybrid fill):            0.008 ms (ID: 1360414)
+ Data transfer time (to RAM):        0.006 ms (ID: 1485008)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):          131.770 ms (ID: 1364675)
+ Total time (per cell fill):      4251.130 ms (ID: 1364675)
+ Total time (hybrid fill):         126.471 ms (ID: 1364675)
+ Data transfer time (to GPU):        2.344 ms (ID: 1364675)
+ Preparation time:                   0.253 ms (ID: 1364675)
+ Border rasterization time:          2.149 ms (ID: 1464872)
+ Fill time (flood fill):           124.085 ms (ID: 1364675)
+ Fill time (per cell fill):       4247.794 ms (ID: 1364675)
+ Fill time (hybrid fill):          123.153 ms (ID: 1364675)
+ Data transfer time (to RAM):        3.954 ms (ID: 1364675)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      400000 polygons
+ Average vetrices per polygon:      33.733 vertices
+ Average MBR per polygon:          146.388 cells
+ Average sectors per polygon:       44.450 sectors
+ Average sector size:                3.293 cells
+ Flood fill usage from hybrid:         1.5 %
+ Per cell usage from hybrid:          98.5 %
+
+Batch 5
+ -------------- Total results: -------------
+ Total time (flood fill):       118550.161 ms
+ Total time (per cell fill):    126222.918 ms
+ Total time (hybrid fill):       73149.927 ms
+ Data transfer time (to GPU):    24598.946 ms
+ Preparation time:                5282.069 ms
+ Border rasterization time:      16489.676 ms
+ Fill time (flood fill):         58152.216 ms
+ Fill time (per cell fill):      71874.715 ms
+ Fill time (hybrid fill):        22082.392 ms
+ Data transfer time (to RAM):     3974.974 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.296 ms
+ Total time (per cell fill):         0.316 ms
+ Total time (hybrid fill):           0.183 ms
+ Data transfer time (to GPU):        0.061 ms
+ Preparation time:                   0.013 ms
+ Border rasterization time:          0.041 ms
+ Fill time (flood fill):             0.145 ms
+ Fill time (per cell fill):          0.180 ms
+ Fill time (hybrid fill):            0.055 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.149 ms (ID: 1621137)
+ Total time (per cell fill):         0.093 ms (ID: 1621087)
+ Total time (hybrid fill):           0.086 ms (ID: 1613181)
+ Data transfer time (to GPU):        0.035 ms (ID: 1617088)
+ Preparation time:                   0.008 ms (ID: 1658540)
+ Border rasterization time:          0.010 ms (ID: 1729907)
+ Fill time (flood fill):             0.054 ms (ID: 1652996)
+ Fill time (per cell fill):          0.009 ms (ID: 1896569)
+ Fill time (hybrid fill):            0.008 ms (ID: 1639770)
+ Data transfer time (to RAM):        0.006 ms (ID: 1887878)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):           92.131 ms (ID: 1697580)
+ Total time (per cell fill):      3605.385 ms (ID: 1697580)
+ Total time (hybrid fill):          87.449 ms (ID: 1697580)
+ Data transfer time (to GPU):        2.206 ms (ID: 1643344)
+ Preparation time:                   0.493 ms (ID: 1778848)
+ Border rasterization time:          1.036 ms (ID: 1643153)
+ Fill time (flood fill):            85.817 ms (ID: 1697580)
+ Fill time (per cell fill):       3601.931 ms (ID: 1697580)
+ Fill time (hybrid fill):           84.939 ms (ID: 1697580)
+ Data transfer time (to RAM):        4.009 ms (ID: 1643344)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      400000 polygons
+ Average vetrices per polygon:      30.332 vertices
+ Average MBR per polygon:          109.197 cells
+ Average sectors per polygon:       36.557 sectors
+ Average sector size:                2.987 cells
+ Flood fill usage from hybrid:         1.0 %
+ Per cell usage from hybrid:          99.0 %
+
+Batch 6
+ -------------- Total results: -------------
+ Total time (flood fill):        79350.491 ms
+ Total time (per cell fill):     95885.672 ms
+ Total time (hybrid fill):       50569.849 ms
+ Data transfer time (to GPU):    15135.790 ms
+ Preparation time:                3312.535 ms
+ Border rasterization time:      10483.571 ms
+ Fill time (flood fill):         41415.664 ms
+ Fill time (per cell fill):      61963.188 ms
+ Fill time (hybrid fill):        18644.744 ms
+ Data transfer time (to RAM):     2551.089 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):            0.314 ms
+ Total time (per cell fill):         0.380 ms
+ Total time (hybrid fill):           0.200 ms
+ Data transfer time (to GPU):        0.060 ms
+ Preparation time:                   0.013 ms
+ Border rasterization time:          0.042 ms
+ Fill time (flood fill):             0.164 ms
+ Fill time (per cell fill):          0.246 ms
+ Fill time (hybrid fill):            0.074 ms
+ Data transfer time (to RAM):        0.010 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            0.153 ms (ID: 2217674)
+ Total time (per cell fill):         0.092 ms (ID: 2034764)
+ Total time (hybrid fill):           0.087 ms (ID: 2058487)
+ Data transfer time (to GPU):        0.035 ms (ID: 2036426)
+ Preparation time:                   0.008 ms (ID: 2117930)
+ Border rasterization time:          0.010 ms (ID: 2058487)
+ Fill time (flood fill):             0.053 ms (ID: 2113754)
+ Fill time (per cell fill):          0.008 ms (ID: 2127695)
+ Fill time (hybrid fill):            0.008 ms (ID: 2201439)
+ Data transfer time (to RAM):        0.006 ms (ID: 2007982)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):          109.147 ms (ID: 2093696)
+ Total time (per cell fill):      2699.976 ms (ID: 2089437)
+ Total time (hybrid fill):         108.667 ms (ID: 2093696)
+ Data transfer time (to GPU):        4.844 ms (ID: 2203735)
+ Preparation time:                   1.002 ms (ID: 2155558)
+ Border rasterization time:          0.981 ms (ID: 2231659)
+ Fill time (flood fill):           106.659 ms (ID: 2093696)
+ Fill time (per cell fill):       2698.412 ms (ID: 2089437)
+ Fill time (hybrid fill):          107.407 ms (ID: 2093696)
+ Data transfer time (to RAM):        7.070 ms (ID: 2203735)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                      252316 polygons
+ Average vetrices per polygon:      36.937 vertices
+ Average MBR per polygon:          168.804 cells
+ Average sectors per polygon:       43.623 sectors
+ Average sector size:                3.870 cells
+ Flood fill usage from hybrid:         2.0 %
+ Per cell usage from hybrid:          98.0 %
+
+
+=================== Best settings, T3NA dataset ===================
+
+ -------------- Total results: -------------
+ Total time (flood fill):       235147.650 ms
+ Total time (per cell fill):  12393073.083 ms
+ Total time (hybrid fill):      220607.214 ms
+ Data transfer time (to GPU):     4780.409 ms
+ Preparation time:                 731.548 ms
+ Border rasterization time:       1421.724 ms
+ Fill time (flood fill):        212096.271 ms
+ Fill time (per cell fill):   12384666.455 ms
+ Fill time (hybrid fill):       212279.805 ms
+ Data transfer time (to RAM):     6243.855 ms
+
+ ------------- Average results: ------------
+ Total time (flood fill):           77.275 ms
+ Total time (per cell fill):      4072.650 ms
+ Total time (hybrid fill):          72.497 ms
+ Data transfer time (to GPU):        1.571 ms
+ Preparation time:                   0.240 ms
+ Border rasterization time:          0.467 ms
+ Fill time (flood fill):            69.700 ms
+ Fill time (per cell fill):       4069.887 ms
+ Fill time (hybrid fill):           69.760 ms
+ Data transfer time (to RAM):        2.052 ms
+
+ ------------- Minimum results: ------------
+ Total time (flood fill):            2.638 ms (ID: 690)
+ Total time (per cell fill):         1.592 ms (ID: 1805)
+ Total time (hybrid fill):           2.807 ms (ID: 690)
+ Data transfer time (to GPU):        0.050 ms (ID: 366)
+ Preparation time:                   0.012 ms (ID: 366)
+ Border rasterization time:          0.071 ms (ID: 1805)
+ Fill time (flood fill):             2.422 ms (ID: 690)
+ Fill time (per cell fill):          1.412 ms (ID: 1805)
+ Fill time (hybrid fill):            2.632 ms (ID: 690)
+ Data transfer time (to RAM):        0.014 ms (ID: 690)
+
+ ------------- Maximum results: ------------
+ Total time (flood fill):          910.611 ms (ID: 710)
+ Total time (per cell fill):    317004.875 ms (ID: 1280)
+ Total time (hybrid fill):         801.831 ms (ID: 710)
+ Data transfer time (to GPU):       51.744 ms (ID: 710)
+ Preparation time:                   5.414 ms (ID: 710)
+ Border rasterization time:          2.048 ms (ID: 1284)
+ Fill time (flood fill):           754.798 ms (ID: 710)
+ Fill time (per cell fill):     316969.875 ms (ID: 1280)
+ Fill time (hybrid fill):          754.761 ms (ID: 710)
+ Data transfer time (to RAM):       97.599 ms (ID: 710)
+
+ ------------- Dataset metrics: ------------
+ Dataset size:                        3043 polygons
+ Average vetrices per polygon:    2316.240 vertices
+ Average MBR per polygon:      1182453.500 cells
+ Average sectors per polygon:     1024.000 sectors
+ Average sector size:             1154.740 cells
+ Flood fill usage from hybrid:       100.0 %
+ Per cell usage from hybrid:           0.0 %
