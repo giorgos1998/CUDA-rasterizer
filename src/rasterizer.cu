@@ -162,13 +162,19 @@ void CUDARasterize(
             int xSectors = poly.mbrWidth;
             int ySectors = poly.mbrHeight;
 
+            // Keep sector size between 4-5 cells.
+            // int xSectors = ceilf(poly.mbrWidth / 5.0f);
+            // int ySectors = ceilf(poly.mbrHeight / 5.0f);
+
             // Max number of sectors is 32*32.
             if (xSectors > 32) { xSectors = 32; }
             if (ySectors > 32) { ySectors = 32; }
             results[6] = xSectors * ySectors;
+            // results[6] = 25;
 
             floodFillPolygonInSectors<<<1, xSectors * ySectors>>>(
                 *poly_D, xSectors, ySectors);
+            // floodFillPolygonInSectors<<<1, 25>>>(*poly_D, 5, 5);
         }
         else {
             results[7] = 2;
